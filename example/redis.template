@@ -60,3 +60,14 @@ outputs:
             get_attr:
             - redis
             - PublicIp
+    description: ssh to the redis host
+  verify:
+    value:
+      str_replace:
+        template: redis-cli -h $host ping
+        params:
+          host:
+            get_attr:
+            - redis
+            - PublicIp
+    description: verify the redis server via redis-cli
