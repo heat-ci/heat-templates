@@ -19,6 +19,11 @@ parameters:
     description: the instance name
     type: String
     default: Wordpress Webserver
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
  
   db_host:
     description: The database hostname
@@ -87,6 +92,7 @@ resources:
       # only tested on Fedora at the moment
       image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
       name: { get_param: server_name }
+      key_name: { get_param: key_name }
       user_data:
         str_replace:
           template: |
