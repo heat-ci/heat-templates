@@ -7,12 +7,10 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: Number 
-    default: 2
+    type: String 
+    default: "2"
     constraints:
-    - range:
-        min: 2
-        max: 8
+    - allowed_values: ["2", "3", "4", "5", "6", "7", "8"] 
       description: must be a valid Rackspace Cloud Server flavor.
 
   server_name:
