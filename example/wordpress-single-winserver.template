@@ -1,13 +1,13 @@
 heat_template_version: 2013-05-23
 
-Description: |
+description: |
   HEAT template for installing Wordpress on Windows Server
 
-Parameters:
+parameters:
 
   name:
-    default: HeatTestResource
     description: Windows Server Name
+    default: HeatTestResource
     type: String
     constraints:
     - length:
@@ -23,7 +23,7 @@ Parameters:
   
   flavor:
     type: String
-    default: '4'
+    default: "4"
     description: Rackspace Cloud Server flavor
     constraints:
     - allowed_values:
@@ -58,7 +58,7 @@ Parameters:
     default: verybadpass_123
 
 
-Resources:
+resources:
 
   RSWindowsServer:
     Type: "Rackspace::Cloud::WinServer"
@@ -81,7 +81,7 @@ Resources:
                   "Start-Process \"C:\\Program Files\\Microsoft\\Web Platform Installer\\WebPICMD.exe\"  -ArgumentList \"/Install /Application:Wordpress@test.app /MySQLPassword:", { "Ref" : "DBAdminPassword" }, " /AcceptEULA /Log:.\\wpi.log\"  -NoNewWindow -Wait\n",
                   "$env:userprofile = $tmpprofile\n"
               ]]}}
-Outputs:
+outputs:
 
   PublicIp:
     Value: { "Fn::GetAtt" : [ "RSWindowsServer", "PublicIp" ] }
