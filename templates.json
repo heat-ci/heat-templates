@@ -9,6 +9,6 @@
       "id": 2,
       "name":"wordpress-multi.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multi.template"
-    },
+    }
   ]
 }
