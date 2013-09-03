@@ -14,6 +14,11 @@
       "id": 3,
       "name":"wordpress-single-winserver.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
+    },
+    {
+      "id": 4,
+      "name":"php-app.template",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/php-app.template"
     }
   ]
 }

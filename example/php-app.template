@@ -1,0 +1,131 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a Wordpress blog server
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: "2"
+    constraints:
+    - allowed_values: ["2", "3", "4", "5", "6", "7", "8"]
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  server_name:
+    description: the instance name
+    type: String
+    default: PHP application
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+ 
+  db_host:
+    description: The database hostname
+    type: String
+    default: localhost
+
+  db_name:
+    default: phpapp
+    description: The database name
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 64
+      description: must be from 1 to 64 characters
+    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
+
+  db_username:
+    default: admin
+    hidden: true
+    description: The database admin account username
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 16
+      description: must be from 1 to 16 characters
+    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
+
+  db_password:
+    default: admin
+    hidden: true
+    description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  git_url:
+    description: URL of a Git repository containing the PHP code.
+    type: String
+    required: true
+    
+
+resources:
+
+  php_app: 
+    type: "Rackspace::Cloud::Server"
+    Metadata :
+      # wip to remove this metadata handling and need for cfn compat
+      # in-instance tools
+      "AWS::CloudFormation::Init": 
+        config: 
+          packages: 
+            yum: 
+              mysql: []
+              httpd: []
+          services: 
+            systemd: 
+              httpd:
+                enabled: True
+                ensureRunning: true 
+    properties:
+      flavor: { get_param: flavor }
+      # only tested on Fedora at the moment
+      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            /usr/bin/cfn-init
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
+            git clone $git_url /var/www/html/
+          params:
+            git_url: { get_param: git_url }
+            dbhost: { get_param: db_host }
+            dbname: { get_param: db_name }
+            dbuser: { get_param: db_username }
+            dbpass: { get_param: db_password }
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ php_app, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ php_app, PrivateIp ] }
+    description: The private ip address of the server
+
+  website_url:
+    value:
+      str_replace:
+        template: http://$ip/
+        params:
+          ip: { get_attr: [ php_app, PublicIp ] }
+    description: URL for PHP app
+
