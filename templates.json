@@ -12,7 +12,7 @@
     },
     {
       "id": 3,
-      "name":"wordpress-multi.template",
+      "name":"wordpress-single-winserver.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
     }
   ]
