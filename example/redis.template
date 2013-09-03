@@ -3,7 +3,9 @@ heat_template_version: 2013-05-23
 description: |
   Simple template to deploy Redis on a cloud server
 
-short_description: Redis
+options:
+  display_hints:
+    short_description: Redis
 
 parameters:
   key-name:
