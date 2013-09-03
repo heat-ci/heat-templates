@@ -3,14 +3,13 @@ heat_template_version: 2013-05-23
 description: |
   Simple template to deploy Redis on a cloud server
 
-options:
-  display_hints:
-    short_description: Redis
 
 parameters:
   key-name:
     type: String
     description: Name of a nova ssh keypair to use for server access
+    display_hints:
+      short_description: Redis
   image:
     # currently requires an image id; refactor in-progress
     # to accept image names as well as ids
