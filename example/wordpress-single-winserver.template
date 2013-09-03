@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+heat_template_version: 2013-05-23
 
 Description: |
   HEAT template for installing Wordpress on Windows Server
@@ -6,44 +6,56 @@ Description: |
 Parameters:
 
   name:
-    Default: HeatTestResource
-    Description: Windows Server Name
-    Type: String
-    MinLength: 1
-    MaxLength: 64
-    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    default: HeatTestResource
+    description: Windows Server Name
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 64
+    - allowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
     
   image:
-    Description: Windows Server Image
-    Type: String
-    Default: Windows Server 2012 (with updates)
+    description: Windows Server Image
+    type: String
+    default: Windows Server 2012 (with updates)
   
   flavor:
-    AllowedValues: ['1', '2', '3', '4', '5', '6', '7', '8']
-    ConstraintDescription: must be a valid Rackspace Cloud Server flavor.
-    Default: '4'
-    Description: Rackspace Cloud Server flavor
-    Type: String
+    type: String
+    default: '4'
+    description: Rackspace Cloud Server flavor
+    constraints:
+    - allowed_values:
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      description: must be a valid Rackspace Cloud Server flavor.
   
   DBName:
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-    Default: wordpress
-    Description: The WordPress database name
-    MaxLength: 64
-    MinLength: 1
-    Type: String
+    type: String
+    default: wordpress
+    description: The WordPress database name
+    constraints:
+    - length:
+        min: 1
+        max: 64
+    - allowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
   
   DBPassword:
-    Description: Database password
-    Type: String
-    Default: verybadpass_123
+    description: Database password
+    type: String
+    default: verybadpass_123
     
   DBAdminPassword:
-    Description: Database Admin password
-    Type: String
-    Default: verybadpass_123
+    description: Database Admin password
+    type: String
+    default: verybadpass_123
 
 
 Resources:
