@@ -86,8 +86,9 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://$ip/
+        template: http://${ip}:${port}/
         params:
           ip: { get_attr: [ rails_server, PublicIp ] }
+          port: { get_param: http_port }
     description: URL for Rails app
 
