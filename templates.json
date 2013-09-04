@@ -24,6 +24,11 @@
       "id": 5,
       "name":"devstack.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/devstack.template"
+    },
+    {
+      "id": 6,
+      "name":"mysql.template",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/mysql.template"
     }
   ]
 }
