@@ -29,6 +29,11 @@
       "id": 6,
       "name":"mysql.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/mysql.template"
+    },
+    {
+      "id": 7,
+      "name":"ruby-on-rails.template",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/ruby-on-rails.template"
     }
   ]
 }
