@@ -67,21 +67,22 @@ resources:
       flavor: { get_param: flavor }
       image: { get_param: image }
       user_data:
-        "Fn::Replace":
-          - "__dbpass__" : { get_param: db_password }
-            "__dbadminpass__": {get_param: db_admin_password }
-          - |
-            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
-            $destination = "webpi.msi"
-            $wc = New-Object System.Net.WebClient
-            $wc.DownloadFile($source, $destination)
+        str_replace:
+          template: |
+            $$source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi\"
+            $$destination = "webpi.msi"
+            $$wc = New-Object System.Net.WebClient
+            $$wc.DownloadFile($$source, $$destination)
             Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
-            echo "DBPassword[@]__dbpass__" "DBAdminPassword[@]__dbadminpass__" > test.app
-            $tmpprofile = $env:userprofile
-            $env:userprofile = "c:\users\administrator"
+            echo DBPassword[@]${dbpassword} DBAdminPassword[@]${dbadminpassword} > test.app
+            $$tmpprofile = $env:userprofile
+            $$env:userprofile = "c:\users\administrator"
             $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
-            Start-Process  $wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:__dbadminpass__ /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
-            $env:userprofile = $tmpprofile
+            Start-Process $wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:${dbadminpassword} /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+            $$env:userprofile = $$tmpprofile"
+          params:
+            dbpassword: { get_param: db_password }
+            dbadminpassword: { get_param: db_admin_password }
 
 
 outputs:
