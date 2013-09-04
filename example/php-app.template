@@ -23,49 +23,6 @@ parameters:
     type: String
     required: true
  
-  db_host:
-    description: The database hostname
-    type: String
-    default: localhost
-
-  db_name:
-    default: phpapp
-    description: The database name
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 64
-      description: must be from 1 to 64 characters
-    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
-      description: must begin with a letter and contain only alphanumeric characters.
-
-  db_username:
-    default: admin
-    hidden: true
-    description: The database admin account username
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 16
-      description: must be from 1 to 16 characters
-    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
-      description: must begin with a letter and contain only alphanumeric characters.
-
-  db_password:
-    default: admin
-    hidden: true
-    description: The database admin account password
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 41 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
   git_url:
     description: URL of a Git repository containing the PHP code.
     type: String
@@ -108,10 +65,6 @@ resources:
             git clone $git_url /var/www/html/
           params:
             git_url: { get_param: git_url }
-            dbhost: { get_param: db_host }
-            dbname: { get_param: db_name }
-            dbuser: { get_param: db_username }
-            dbpass: { get_param: db_password }
 
 outputs:
   
