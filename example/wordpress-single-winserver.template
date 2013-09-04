@@ -69,7 +69,7 @@ resources:
       user_data:
         str_replace:
           template: |
-            $$source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi\"
+            $$source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
             $$destination = "webpi.msi"
             $$wc = New-Object System.Net.WebClient
             $$wc.DownloadFile($$source, $$destination)
@@ -79,7 +79,7 @@ resources:
             $$env:userprofile = "c:\users\administrator"
             $$wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
             Start-Process $$wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:${dbadminpassword} /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
-            $$env:userprofile = $$tmpprofile"
+            $$env:userprofile = $$tmpprofile
           params:
             dbpassword: { get_param: db_password }
             dbadminpassword: { get_param: db_admin_password }
