@@ -75,10 +75,10 @@ resources:
             $$wc.DownloadFile($$source, $$destination)
             Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
             echo DBPassword[@]${dbpassword} DBAdminPassword[@]${dbadminpassword} > test.app
-            $$tmpprofile = $env:userprofile
+            $$tmpprofile = $$env:userprofile
             $$env:userprofile = "c:\users\administrator"
-            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
-            Start-Process $wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:${dbadminpassword} /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+            $$wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
+            Start-Process $$wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:${dbadminpassword} /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
             $$env:userprofile = $$tmpprofile"
           params:
             dbpassword: { get_param: db_password }
