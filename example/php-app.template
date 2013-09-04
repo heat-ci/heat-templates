@@ -1,7 +1,7 @@
 heat_template_version: 2013-05-23
 
 description: |
-  A template implementation of a resource that provides a Wordpress blog server
+  A template implementation of a resource that provides a PHP application server
 
 parameters:
 
