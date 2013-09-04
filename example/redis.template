@@ -24,13 +24,11 @@ parameters:
   flavor:
     # currently requires an id; refactor in-progress
     # to allow flavor names as well as ids
-    type: Number
     description: Server flavor id to use
+    type: String 
     constraints:
-    - range:
-        min: 2
-        max: 8
-      description: must be a valid flavor id
+    - allowed_values: ["2", "3", "4", "5", "6", "7", "8"] 
+      description: must be a valid Rackspace Cloud Server flavor.
 
 resources:
   redis:
