@@ -8,7 +8,7 @@ parameters:
   flavor:
     description: Rackspace Cloud Server flavor
     type: String 
-    default: "2"
+    default: "4"
     constraints:
     - allowed_values: ["2", "3", "4", "5", "6", "7", "8"]
       description: must be a valid Rackspace Cloud Server flavor.
@@ -31,13 +31,34 @@ parameters:
   server_name:
     description: the instance name
     type: String
-    default: PHP application
+    default: Devstack server
 
   key_name:
     description: Nova keypair name for ssh access to the server
     type: String
     required: true
- 
+
+  db_password:
+    default: admin
+    hidden: true
+    description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  enable_heat:
+    default: "false"
+    description: Enable the Heat service in Devstack
+    type: String
+    constraints:
+    - allowed_values: ["true", "false"]
+      description: Either "true" or "false"
+
 resources:
 
   devstack_server: 
@@ -49,11 +70,26 @@ resources:
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
-        template: |
-          #!/bin/bash -v
-          /usr/bin/cfn-init
-          git clone git://github.com/openstack-dev/devstack.git
-          cd devstack; ./stack.sh
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            cfn-init
+            image=$image
+            if [[ $$image == "23b564c9-c3e6-49f9-bc68-86c7a9ab5018" ]]; then
+                apt-get install -y git
+            else
+                yum -y install git
+            fi
+            git clone git://github.com/openstack-dev/devstack.git
+            cd devstack
+            if [[ $enable_heat == "true" ]]; then
+                echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
+            fi
+            echo $dbpass | ./stack.sh
+          params:
+            dbpass: { get_param: db_password }
+            enable_heat: { get_param: enable_heat }
+            image: { get_param: image }
 
 outputs:
   
