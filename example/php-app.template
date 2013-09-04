@@ -85,6 +85,8 @@ resources:
             yum: 
               mysql: []
               httpd: []
+              git: []
+              php: []
           services: 
             systemd: 
               httpd:
