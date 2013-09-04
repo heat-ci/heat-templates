@@ -1,0 +1,66 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a Devstack server
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: "2"
+    constraints:
+    - allowed_values: ["2", "3", "4", "5", "6", "7", "8"]
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  image:
+    # currently requires an image id; refactor in-progress
+    # to accept image names as well as ids
+    type: String
+    description: Server image id to use
+    default: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+    constraints:
+    # only tested on Ubuntu images so far
+    - allowed_values:
+      - 25a5f2e8-f522-4fe0-b0e0-dbaa62405c25  # CentOS 6.4
+      - e0c3a14d-b1dc-451b-ade4-d419501aa121  # Red Hat Enterprise Linux 6.4
+      - 23b564c9-c3e6-49f9-bc68-86c7a9ab5018  # Ubuntu 12.04 LTS (Precise Pangolin)
+      - 427e993a-79b4-46b4-a0e6-8adec781a360  # Fedora 18 (Spherical Cow)
+      description: must be an ID of a Devstack-supported distro
+
+  server_name:
+    description: the instance name
+    type: String
+    default: PHP application
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+ 
+resources:
+
+  devstack_server: 
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      # only tested on Fedora at the moment
+      image: { get_param: image }
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        template: |
+          #!/bin/bash -v
+          /usr/bin/cfn-init
+          git clone git://github.com/openstack-dev/devstack.git
+          cd devstack; ./stack.sh
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ devstack_server, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ devstack_server, PrivateIp ] }
+    description: The private ip address of the server
