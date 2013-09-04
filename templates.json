@@ -2,37 +2,37 @@
   "templates": [
     {
       "id": 1,
-      "name":"redis.template",
+      "name":"Single Instance Redis Server",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/redis.template"
     },
     {
       "id": 2,
-      "name":"wordpress-multi.template",
+      "name":"Multi-node Wordpress (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multi.template"
     },
     {
       "id": 3,
-      "name":"wordpress-single-winserver.template",
+      "name":"Single-node Wordpress (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
     },
     {
       "id": 4,
-      "name":"php-app.template",
+      "name":"PHP Application Server",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/php-app.template"
     },
     {
       "id": 5,
-      "name":"devstack.template",
+      "name":"Devstack",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/devstack.template"
     },
     {
       "id": 6,
-      "name":"mysql.template",
+      "name":"MySQL Server",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/mysql.template"
     },
     {
       "id": 7,
-      "name":"ruby-on-rails.template",
+      "name":"Ruby on Rails Application Server",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/ruby-on-rails.template"
     }
   ]
