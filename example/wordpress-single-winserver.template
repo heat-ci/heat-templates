@@ -5,7 +5,7 @@ description: |
 
 parameters:
 
-  name:
+  server_hostname:
     type: String
     default: HeatWinResource
     description: Windows Server Name
@@ -63,7 +63,7 @@ resources:
   rs_windows_server:
     type: "Rackspace::Cloud::WinServer"
     properties:
-      name: { get_param: name }
+      name: { get_param: server_hostname }
       flavor: { get_param: flavor }
       image: { get_param: image }
       user_data:
