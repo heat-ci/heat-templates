@@ -66,18 +66,23 @@ resources:
       name: { get_param: name }
       flavor: { get_param: flavor }
       image: { get_param: image }
-      user_data: { "Fn::Base64" : { "Fn::Join" : ["", [
-                  "$source = \"http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi\"\n",
-                  "$destination = \"webpi.msi\"\n",
-                  "$wc = New-Object System.Net.WebClient\n",
-                  "$wc.DownloadFile($source, $destination)\n",
-                  "Start-Process msiexec -ArgumentList \"/i webpi.msi /qn\"  -NoNewWindow -Wait\n",
-                  "echo \"DBPassword[@]", { "Ref" : "DBPassword" }, "\" \"DBAdminPassword[@]", { "Ref" : "DBAdminPassword" }, "\" > test.app\n",
-                  "$tmpprofile = $env:userprofile\n",
-                  "$env:userprofile = \"c:\\users\\administrator\"\n",
-                  "Start-Process \"C:\\Program Files\\Microsoft\\Web Platform Installer\\WebPICMD.exe\"  -ArgumentList \"/Install /Application:Wordpress@test.app /MySQLPassword:", { "Ref" : "DBAdminPassword" }, " /AcceptEULA /Log:.\\wpi.log\"  -NoNewWindow -Wait\n",
-                  "$env:userprofile = $tmpprofile\n"
-              ]]}}
+      user_data:
+        "Fn::Replace":
+          - "__dbpass__" : { get_param: db_password }
+            "__dbadminpass__": {get_param: db_admin_password }
+          - 
+            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+            $destination = "webpi.msi"
+            $wc = New-Object System.Net.WebClient
+            $wc.DownloadFile($source, $destination)
+            Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
+            echo "DBPassword[@]__dbpass__" "DBAdminPassword[@]__dbadminpass__" > test.app
+            $tmpprofile = $env:userprofile
+            $env:userprofile = "c:\users\administrator"
+            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
+            Start-Process  $wpicmd -ArgumentList "/Install /Application:Wordpress@test.app /MySQLPassword:__dbadminpass__ /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+            $env:userprofile = $tmpprofile
+
 
 outputs:
 
