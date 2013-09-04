@@ -19,6 +19,11 @@
       "id": 4,
       "name":"php-app.template",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/php-app.template"
+    },
+    {
+      "id": 5,
+      "name":"devstack.template",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/devstack.template"
     }
   ]
 }
