@@ -101,7 +101,7 @@ parameters:
 resources:
 
   web_node_1: 
-    type: "https://github.rackspace.com/Heat/heat-templates/raw/master/example/wp-resource.template"
+    type: "https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wp-resource.template"
     properties:
       flavor: { get_param: web_node_flavor }
       server_name:
@@ -116,7 +116,7 @@ resources:
       db_password: { get_param: db_password }
 
   web_node_2: 
-    type: "https://github.rackspace.com/Heat/heat-templates/raw/master/example/wp-resource.template"
+    type: "https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wp-resource.template"
     properties:
       flavor: { get_param: web_node_flavor }
       server_name:
