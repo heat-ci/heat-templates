@@ -34,6 +34,11 @@
       "id": 7,
       "name":"Ruby on Rails Application Server",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/ruby-on-rails.template"
+    },
+    {
+      "id": 8,
+      "name":"DotNetNuke Application (Windows)",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
     }
   ]
 }
