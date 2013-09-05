@@ -80,7 +80,7 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://$ip/dotnetnuke
+        template: http://$ip/dotnetnuke/default.aspx
         params:
           ip: { get_attr: [ rs_windows_server, PublicIp ] }
     description: URL for Wordpress site
