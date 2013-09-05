@@ -101,34 +101,54 @@ parameters:
 resources:
 
   web_node_1: 
-    type: "https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wp-resource.template"
+    type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: web_node_flavor }
-      server_name:
-        str_replace:
-          template: $server_name-1
-          params:
-            server_name: { get_param: web_server_name }
+      # only tested on Fedora at the moment
+      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
+      name: { get_param: web_server_name }
       key_name: { get_param: key_name }
-      db_host: { get_attr: [ db, hostname ] }
-      db_name: { get_param: db_name }
-      db_username: { get_param: db_username }
-      db_password: { get_param: db_password }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            yum -y install mysql httpd wordpress
+            sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
+            sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
+            sed --in-place --e "s/localhost/$dbhost/" --e "s/database_name_here/$dbname/" --e "s/username_here/$dbuser/" --e "s/password_here/$dbpass/" /usr/share/wordpress/wp-config.php
+            systemctl start httpd.service
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
+          params:
+            dbhost: { get_attr: [ db, hostname ] }
+            dbname: { get_param: db_name }
+            dbuser: { get_param: db_username }
+            dbpass: { get_param: db_password }
 
   web_node_2: 
-    type: "https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wp-resource.template"
+    type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: web_node_flavor }
-      server_name:
-        str_replace:
-          template: $server_name-2
-          params:
-            server_name: { get_param: web_server_name }
+      # only tested on Fedora at the moment
+      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
+      name: { get_param: web_server_name }
       key_name: { get_param: key_name }
-      db_host: { get_attr: [ db, hostname ] }
-      db_name: { get_param: db_name }
-      db_username: { get_param: db_username }
-      db_password: { get_param: db_password }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            yum -y install mysql httpd wordpress
+            sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
+            sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
+            sed --in-place --e "s/localhost/$dbhost/" --e "s/database_name_here/$dbname/" --e "s/username_here/$dbuser/" --e "s/password_here/$dbpass/" /usr/share/wordpress/wp-config.php
+            systemctl start httpd.service
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
+          params:
+            dbhost: { get_attr: [ db, hostname ] }
+            dbname: { get_param: db_name }
+            dbuser: { get_param: db_username }
+            dbpass: { get_param: db_password }
 
   lb:
     type: "Rackspace::Cloud::LoadBalancer"
@@ -168,12 +188,7 @@ resources:
         path: "/"
         statusRegex: "."
         bodyRegex: "."
-        hostHeader: "example.com"
       contentCaching: ENABLED
-      errorPage: You were a bad person, causing errors and such.
-      accessList:
-      - address: "173.194.77.103"
-        type: DENY
 
   db:
     type: "Rackspace::Cloud::DBInstance"
