@@ -27,26 +27,18 @@ resources:
 
   mysql_server: 
     type: "Rackspace::Cloud::Server"
-    Metadata :
-      "AWS::CloudFormation::Init": 
-        config: 
-          packages: 
-            yum: 
-              mysql: []
-          services: 
-            systemd: 
-              httpd:
-                enabled: True
-                ensureRunning: true 
     properties:
       flavor: { get_param: flavor }
-      # only tested on Fedora at the moment
       image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
       name: { get_param: server_name }
       key_name: { get_param: key_name }
+      user_data: |
+        yum -y install mysql-server
+        systemctl start mysqld.service
+        systemctl enable mysqld.service
 
 outputs:
-  
+
   public_ip:
     value: { get_attr: [ mysql_server, PublicIp ] }
     description: The public ip address of the server

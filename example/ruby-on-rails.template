@@ -41,20 +41,8 @@ resources:
 
   rails_server: 
     type: "Rackspace::Cloud::Server"
-    Metadata :
-      # wip to remove this metadata handling and need for cfn compat
-      # in-instance tools
-      "AWS::CloudFormation::Init": 
-        config: 
-          packages: 
-            yum: 
-              ruby-devel: []
-              rubygem-rails: []
-              sqlite-devel: []
-              git: []
     properties:
       flavor: { get_param: flavor }
-      # only tested on Fedora at the moment
       image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
       name: { get_param: server_name }
       key_name: { get_param: key_name }
@@ -62,7 +50,7 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
-            /usr/bin/cfn-init
+            yum -y install ruby-devel rubygem-rails sqlite-devel git
             iptables -I INPUT -p tcp --dport $http_port -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
             rails new $rails_path
