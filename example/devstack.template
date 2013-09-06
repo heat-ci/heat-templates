@@ -111,12 +111,16 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
+
+            # Install requirements
             image=$image
             if [[ $$image == "23b564c9-c3e6-49f9-bc68-86c7a9ab5018" ]]; then
                 apt-get install -y git emacs
             else
                 yum -y install git emacs
             fi
+
+            # Configure and install Devstack
             git clone git://github.com/openstack-dev/devstack.git
             cd devstack
             if [[ $enable_heat == "true" ]]; then
@@ -136,18 +140,33 @@ resources:
             fi
             echo "SERVICE_TOKEN=$$(openssl rand -hex 10)" >> localrc
             ./stack.sh
-            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~stack/.bash_profile
-            chown stack:stack ~stack/.bash_profile
+
+            # Add the SSH key to the stack user
             mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
             tail -n1 ~/.ssh/authorized_keys > ~stack/.ssh/authorized_keys
             chmod 400 ~stack/.ssh/authorized_keys
-            nova --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add jason --pub-key ~stack/.ssh/authorized_keys
+
+            # Add the key to nova
+            nova --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add $key_name --pub-key ~stack/.ssh/authorized_keys
+
+            [[ $enable_heat != "true" ]] && exit 0
+
+            # Download convenience functions for Heat
+            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~stack/.bash_profile
+            chown stack:stack ~stack/.bash_profile
+            
+            # Download & install prebuilt Heat JEOS images
+            glance --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ image-create --disk-format=qcow2 --container-format=ovf --location http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-i386-cfntools.qcow2 --name F17-i386-cfntools
+            glance --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ image-create --disk-format=qcow2 --container-format=ovf --location http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-x86_64-cfntools.qcow2 --name F17-x86_64-cfntools
+            glance --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ image-create --disk-format=qcow2 --container-format=ovf --location http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-i386-cfntools.qcow2 --name F18-i386-cfntools
+            glance --os-username admin --os-password admin --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ image-create --disk-format=qcow2 --container-format=ovf --location http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2 --name F18-x86_64-cfntools
           params:
             mysql_pass: { get_param: mysql_pass }
             admin_pass: { get_param: admin_pass }
             rabbit_pass: { get_param: rabbit_pass }
             service_pass: { get_param: service_pass }
             enable_heat: { get_param: enable_heat }
+            key_name: { get_param: key_name }
             image: { get_param: image }
 
 outputs:
