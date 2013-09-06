@@ -134,7 +134,7 @@ resources:
             if [[ -n $service_pass ]]; then
                 echo "SERVICE_PASSWORD=${service_pass}" >> localrc
             fi
-            echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
+            echo "SERVICE_TOKEN=$$(openssl rand -hex 10)" >> localrc
             ./stack.sh
           params:
             mysql_pass: { get_param: mysql_pass }
