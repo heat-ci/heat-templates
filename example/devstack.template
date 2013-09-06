@@ -38,10 +38,49 @@ parameters:
     type: String
     required: true
 
-  db_password:
+  mysql_pass:
     default: admin
     hidden: true
     description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  admin_pass:
+    default: admin
+    hidden: true
+    description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  service_pass:
+    default: admin
+    hidden: true
+    description: The service password which is used by the OpenStack services to authenticate with Keystone.
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  rabbit_pass:
+    default: admin
+    hidden: true
+    description: The RabbitMQ service admin password
     type: String
     constraints:
     - length:
@@ -83,9 +122,25 @@ resources:
             if [[ $enable_heat == "true" ]]; then
                 echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
             fi
-            echo $dbpass | ./stack.sh
+            if [[ -n $admin_pass ]]; then
+                echo "ADMIN_PASSWORD=${admin_pass}" >> localrc
+            fi
+            if [[ -n $mysql_pass ]]; then
+                echo "MYSQL_PASSWORD=${mysql_pass}" >> localrc
+            fi
+            if [[ -n $rabbit_pass ]]; then
+                echo "RABBIT_PASSWORD=${rabbit_pass}" >> localrc
+            fi
+            if [[ -n $service_pass ]]; then
+                echo "SERVICE_PASSWORD=${service_pass}" >> localrc
+            fi
+            echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
+            ./stack.sh
           params:
-            dbpass: { get_param: db_password }
+            mysql_pass: { get_param: mysql_pass }
+            admin_pass: { get_param: admin_pass }
+            rabbit_pass: { get_param: rabbit_pass }
+            service_pass: { get_param: service_pass }
             enable_heat: { get_param: enable_heat }
             image: { get_param: image }
 
