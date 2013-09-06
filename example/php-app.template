@@ -27,7 +27,7 @@ resources:
     type: "OS::Nova::Server"
     properties:
       flavor: "m1.small"
-      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
+      image: 13eacb4e-e6ed-44b0-9c62-1dfeeb1e27c8
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
