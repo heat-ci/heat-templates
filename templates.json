@@ -42,7 +42,7 @@
     },
     {
       "id": 9,
-      "name":"Multi-node Wordpress (Windows)",
+      "name":"Multi-node Wordpress (Windows + LB + Cloud DB)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multinode-windows.template"
     },
     {
