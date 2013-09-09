@@ -44,6 +44,11 @@
       "id": 9,
       "name":"Multi-node Wordpress (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multinode-windows.template"
+    },
+    {
+      "id": 10,
+      "name":"Single-node Wordpress (Windows + Cloud DB)",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-winserver-clouddb.template"
     }
   ]
 }
