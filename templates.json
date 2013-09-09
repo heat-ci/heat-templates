@@ -39,6 +39,11 @@
       "id": 8,
       "name":"DotNetNuke Application (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
+    },
+    {
+      "id": 9,
+      "name":"Multi-node Wordpress (Windows)",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multinode-windows.template"
     }
   ]
 }
