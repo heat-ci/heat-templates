@@ -11,42 +11,42 @@
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multi.template"
     },
     {
-      "id": 4,
+      "id": 3,
       "name":"PHP Application Server (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/php-app.template"
     },
     {
-      "id": 5,
+      "id": 4,
       "name":"Devstack (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/devstack.template"
     },
     {
-      "id": 6,
+      "id": 5,
       "name":"MySQL Serveri (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/mysql.template"
     },
     {
-      "id": 7,
+      "id": 6,
       "name":"Ruby on Rails Application Serveri (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/ruby-on-rails.template"
     },
     {
-      "id": 8,
+      "id": 7,
       "name":"Single-node Wordpress (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
     },
     {
-      "id": 9,
+      "id": 8,
       "name":"Multi-node Wordpress (Windows + LB + Cloud DB)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multinode-windows.template"
     },
     {
-      "id": 10,
+      "id": 9,
       "name":"Single-node Wordpress (Windows + Cloud DB)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-winserver-clouddb.template"
     },
     {
-      "id": 11,
+      "id": 10,
       "name":"DotNetNuke Application (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
     }
