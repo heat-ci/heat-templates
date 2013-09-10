@@ -2,7 +2,7 @@
   "templates": [
     {
       "id": 1,
-      "name":"Single Instance Redis Server",
+      "name":"Single Instance Redis Server (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/redis.template"
     },
     {
@@ -11,34 +11,29 @@
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-multi.template"
     },
     {
-      "id": 3,
-      "name":"Single-node Wordpress (Windows)",
-      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
-    },
-    {
       "id": 4,
-      "name":"PHP Application Server",
+      "name":"PHP Application Server (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/php-app.template"
     },
     {
       "id": 5,
-      "name":"Devstack",
+      "name":"Devstack (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/devstack.template"
     },
     {
       "id": 6,
-      "name":"MySQL Server",
+      "name":"MySQL Serveri (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/mysql.template"
     },
     {
       "id": 7,
-      "name":"Ruby on Rails Application Server",
+      "name":"Ruby on Rails Application Serveri (Linux)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/ruby-on-rails.template"
     },
     {
       "id": 8,
-      "name":"DotNetNuke Application (Windows)",
-      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
+      "name":"Single-node Wordpress (Windows)",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-single-winserver.template"
     },
     {
       "id": 9,
@@ -49,6 +44,11 @@
       "id": 10,
       "name":"Single-node Wordpress (Windows + Cloud DB)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/wordpress-winserver-clouddb.template"
+    },
+    {
+      "id": 11,
+      "name":"DotNetNuke Application (Windows)",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
     }
   ]
 }
