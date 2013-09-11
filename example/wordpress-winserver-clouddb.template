@@ -9,10 +9,9 @@ parameters:
   web_node_flavor:
     description: flavor id for the web server instances
     Type: String
-    Default: "2"
+    Default: "3"
     constraints:
     - allowed_values:
-      - "2"
       - "3"
       - "4"
       - "5"
