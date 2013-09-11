@@ -49,6 +49,11 @@
       "id": 10,
       "name":"DotNetNuke Application (Windows)",
       "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/dotnetnuke.template"
+    },
+    {
+      "id": 11,
+      "name":"All-in-one Rackspace Private Cloud",
+      "url":"https://raw.github.com/rackerlabs/heat-prod-templates/master/example/rs-private-cloud.template"
     }
   ]
 }
