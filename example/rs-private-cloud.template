@@ -76,8 +76,8 @@ resources:
             knife role from file /opt/rpcs/chef-cookbooks/roles/*.rb
             # Nova Network
             curl -L --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/${admin_password}/" > rpcs.json
-            IP="`ifconfig eth0 | grep -i "inet addr" | awk '{print $$2}' | awk -F ":" '{print $$2}'`/32"
-            sed -i "s/10.240.0.0\/24/$$IP/g" rpcs.json
+            IP=$$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}')
+            sed -i "s/10.240.0.0\/24/$$IP\/32/g" rpcs.json
             knife environment from file rpcs.json
             export CHEF_SERVER_URL=https://$$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}'):4000
             knife bootstrap localhost -E rpcs -r 'role[allinone]'
