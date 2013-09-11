@@ -15,8 +15,8 @@ resources:
   rpc_demo_server: 
     type: "Rackspace::Cloud::Server"
     properties:
-      flavor: 8GB Standard Instance
-      image: Ubuntu 12.04 LTS (Precise Pangolin)
+      flavor: 6
+      image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
       name: Rackspace Private Cloud Server
       key_name: { get_param: key_name }
       user_data: |
@@ -55,7 +55,7 @@ resources:
         git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/rpcs/chef-cookbooks
         cd /opt/rpcs/chef-cookbooks
         git submodule init
-        git checkout v4.1.0
+        git checkout master
         git submodule update
         knife cookbook site download -f /tmp/cron.tar.gz cron 1.2.6 && tar xf /tmp/cron.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
         knife cookbook site download -f /tmp/chef-client.tar.gz chef-client 3.0.6 && tar xf /tmp/chef-client.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
