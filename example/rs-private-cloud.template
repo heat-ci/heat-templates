@@ -21,8 +21,8 @@ resources:
       key_name: { get_param: key_name }
       user_data: |
         # generate a key
-        ssh-keygen -A
-        cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+        ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ''
+        cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
         # install chef stuff
         apt-get install -y rabbitmq-server git curl
         export CHEF_RMQ_PW=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)
@@ -68,7 +68,7 @@ resources:
         knife cookbook upload -o /opt/rpcs/chef-cookbooks/cookbooks -a
         knife role from file /opt/rpcs/chef-cookbooks/roles/*.rb
         # Nova Network
-        curl --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)/" > rpcs.json
+        curl -L --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)/" > rpcs.json
         knife environment from file rpcs.json
         export CHEF_SERVER_URL=https://$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}'):4000
         knife bootstrap localhost -E rpcs -r 'role[allinone]'
