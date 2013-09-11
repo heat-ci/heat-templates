@@ -86,7 +86,7 @@ resources:
 
 outputs:
   
-  constrol_panel:
+  control_panel:
     value:
       str_replace:
         template: https://${ip_addr}
