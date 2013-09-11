@@ -22,7 +22,7 @@ resources:
       user_data: |
         # generate a key
         ssh-keygen -A
-        cat ~/.ssh/id-rsa.pub >> ~/.ssh/authorized_keys
+        cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
         # install chef stuff
         apt-get install -y rabbitmq-server git curl
         export CHEF_RMQ_PW=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)
