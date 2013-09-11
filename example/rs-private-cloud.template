@@ -1,182 +1,81 @@
 heat_template_version: 2013-05-23
 
 description: |
-  A template implementation of a resource that provides a Devstack server
+  A template for deploying Rackspace Private Cloud on Rackspace Public Cloud
 
 parameters:
 
-  flavor:
-    description: Rackspace Cloud Server flavor
-    type: String 
-    default: "4"
-    constraints:
-    - allowed_values: ["3", "4", "5", "6", "7", "8"]
-      description: must be a valid Rackspace Cloud Server flavor and be large enough to run devstack
-
-  image:
-    # currently requires an image id; refactor in-progress
-    # to accept image names as well as ids
-    type: String
-    description: Server image id to use
-    default: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
-    constraints:
-    # only tested on Ubuntu images so far
-    - allowed_values:
-      - 25a5f2e8-f522-4fe0-b0e0-dbaa62405c25  # CentOS 6.4
-      - e0c3a14d-b1dc-451b-ade4-d419501aa121  # Red Hat Enterprise Linux 6.4
-      - 23b564c9-c3e6-49f9-bc68-86c7a9ab5018  # Ubuntu 12.04 LTS (Precise Pangolin)
-      - 427e993a-79b4-46b4-a0e6-8adec781a360  # Fedora 18 (Spherical Cow)
-      description: must be an ID of a Devstack-supported distro
-
-  server_name:
-    description: the instance name
-    type: String
-    default: Devstack server
-
-  key_name:
-    description: Nova keypair name for ssh access to the server
-    type: String
-    required: true
-
-  mysql_pass:
-    default: admin
-    hidden: true
-    description: The database admin account password
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 41 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
-  admin_pass:
-    default: admin
-    hidden: true
-    description: The database admin account password
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 41 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
-  service_pass:
-    default: admin
-    hidden: true
-    description: The service password which is used by the OpenStack services to authenticate with Keystone.
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 41 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
-  rabbit_pass:
-    default: admin
-    hidden: true
-    description: The RabbitMQ service admin password
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 41 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
-  enable_heat:
-    default: "false"
-    description: Enable the Heat service in Devstack
-    type: String
-    constraints:
-    - allowed_values: ["true", "false"]
-      description: must be either "true" or "false"
+    key_name:
+      type: String
+      description: Nova keypair name for access to instances
+      required: true
 
 resources:
 
-  devstack_server: 
+  rpc_demo_server: 
     type: "Rackspace::Cloud::Server"
     properties:
-      flavor: { get_param: flavor }
-      image: { get_param: image }
-      name: { get_param: server_name }
+      flavor: 8GB Standard Instance
+      image: Ubuntu 12.04 LTS (Precise Pangolin)
+      name: Rackspace Private Cloud Server
       key_name: { get_param: key_name }
-      user_data:
-        str_replace:
-          template: |
-            #!/bin/bash -v
-
-            # Install requirements
-            image=$image
-            packages="git emacs nmap"
-            if [[ $$image == "23b564c9-c3e6-49f9-bc68-86c7a9ab5018" ]]; then
-                apt-get install -y $$packages
-            else
-                yum -y install $$packages
-            fi
-
-            # Configure and install Devstack
-            git clone git://github.com/openstack-dev/devstack.git
-            cd devstack
-            if [[ $enable_heat == "true" ]]; then
-                echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
-            fi
-            if [[ -n $admin_pass ]]; then
-                echo "ADMIN_PASSWORD=${admin_pass}" >> localrc
-            fi
-            if [[ -n $mysql_pass ]]; then
-                echo "MYSQL_PASSWORD=${mysql_pass}" >> localrc
-            fi
-            if [[ -n $rabbit_pass ]]; then
-                echo "RABBIT_PASSWORD=${rabbit_pass}" >> localrc
-            fi
-            if [[ -n $service_pass ]]; then
-                echo "SERVICE_PASSWORD=${service_pass}" >> localrc
-            fi
-            echo "SERVICE_TOKEN=$$(openssl rand -hex 10)" >> localrc
-            ./stack.sh
-
-            # Add the SSH key to the stack user
-            mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
-            tail -n1 ~/.ssh/authorized_keys > ~stack/.ssh/authorized_keys
-            chmod 400 ~stack/.ssh/authorized_keys
-
-            # Add the key to nova
-            nova --os-username admin --os-password $admin_pass --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add $key_name --pub-key ~stack/.ssh/authorized_keys
-
-            # Heat-specific configs below
-            [[ $enable_heat != "true" ]] && exit 0
-
-            # Download convenience functions for Heat
-            su -l stack -c "curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile"
-            source ~stack/.bash_profile
-
-            # Download & install prebuilt Heat JEOS images
-            glance_create F17-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-i386-cfntools.qcow2
-            glance_create F17-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-x86_64-cfntools.qcow2
-            glance_create F18-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-i386-cfntools.qcow2
-            glance_create F18-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2
-          params:
-            mysql_pass: { get_param: mysql_pass }
-            admin_pass: { get_param: admin_pass }
-            rabbit_pass: { get_param: rabbit_pass }
-            service_pass: { get_param: service_pass }
-            enable_heat: { get_param: enable_heat }
-            key_name: { get_param: key_name }
-            image: { get_param: image }
+      user_data: |
+        # install chef stuff
+        apt-get install -y rabbitmq-server git curl
+        export CHEF_RMQ_PW=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)
+        rabbitmqctl add_vhost /chef
+        rabbitmqctl add_user chef $CHEF_RMQ_PW
+        rabbitmqctl set_permissions -p /chef chef '.*' '.*' '.*'
+        wget -O /tmp/chef_server.deb https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.0.8-1.ubuntu.12.04_amd64.deb
+        dpkg -i /tmp/chef_server.deb
+        mkdir /etc/chef-server
+        cat > /etc/chef-server/chef-server.rb <<EOF
+        nginx["ssl_port"] = 4000
+        nginx["non_ssl_port"] = 4080
+        nginx["enable_non_ssl"] = true
+        rabbitmq["enable"] = false
+        rabbitmq["password"] = "$CHEF_RMQ_PW"
+        bookshelf['url'] = "https://#{node['ipaddress']}:4000"
+        EOF
+        chef-server-ctl reconfigure
+        bash <(wget -O - http://opscode.com/chef/install.sh)
+        mkdir /root/.chef
+        cat > /root/.chef/knife.rb <<EOF
+        log_level                :info
+        log_location             STDOUT
+        node_name                'admin'
+        client_key               '/etc/chef-server/admin.pem'
+        validation_client_name   'chef-validator'
+        validation_key           '/etc/chef-server/chef-validator.pem'
+        chef_server_url          'https://localhost:4000'
+        cache_options( :path => '/root/.chef/checksums' )
+        cookbook_path            [ '/opt/rpcs/chef-cookbooks/cookbooks' ]
+        EOF
+        mkdir -p /opt/rpcs
+        git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/rpcs/chef-cookbooks
+        cd /opt/rpcs/chef-cookbooks
+        git submodule init
+        git checkout v4.1.0
+        git submodule update
+        knife cookbook site download -f /tmp/cron.tar.gz cron 1.2.6 && tar xf /tmp/cron.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
+        knife cookbook site download -f /tmp/chef-client.tar.gz chef-client 3.0.6 && tar xf /tmp/chef-client.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
+        mkdir -p /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
+        curl http://cookbooks.howopenstack.org/rpc-support.tar.gz | tar zxf - -C /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
+        wget http://cookbooks.howopenstack.org/roles/rpc-support.rb -O /opt/rpcs/chef-cookbooks/roles/rpc-support.rb
+        knife cookbook upload -o /opt/rpcs/chef-cookbooks/cookbooks -a
+        knife role from file /opt/rpcs/chef-cookbooks/roles/*.rb
+        # Nova Network
+        curl --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)/" > rpcs.json
+        knife environment from file rpcs.json
+        export CHEF_SERVER_URL=https://$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}'):4000
+        knife bootstrap localhost -E rpcs -r 'role[allinone]'
 
 outputs:
   
-  public_ip:
-    value: { get_attr: [ devstack_server, PublicIp ] }
-    description: The public ip address of the server
-
-  private_ip:
-    value: { get_attr: [ devstack_server, PrivateIp ] }
-    description: The private ip address of the server
+  constrol_panel:
+    value:
+      str_replace:
+        template: https://${ip_addr}
+        values:
+          ip_addr: { get_attr: [ rpc_demo_server, PublicIp ] }
+    description: URL to the Horizon control panel for your new cloud
