@@ -79,6 +79,6 @@ outputs:
     value:
       str_replace:
         template: https://${ip_addr}
-        values:
+        params:
           ip_addr: { get_attr: [ rpc_demo_server, PublicIp ] }
     description: URL to the Horizon control panel for your new cloud
