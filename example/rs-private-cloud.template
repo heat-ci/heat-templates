@@ -5,6 +5,11 @@ description: |
 
 parameters:
 
+    admin_password:
+      type: String
+      description: Admin user password
+      default: admin
+      
     key_name:
       type: String
       description: Nova keypair name for access to instances
@@ -19,59 +24,65 @@ resources:
       image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
       name: Rackspace Private Cloud Server
       key_name: { get_param: key_name }
-      user_data: |
-        # generate a key
-        ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ''
-        cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-        # install chef stuff
-        apt-get install -y rabbitmq-server git curl
-        export CHEF_RMQ_PW=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)
-        rabbitmqctl add_vhost /chef
-        rabbitmqctl add_user chef $CHEF_RMQ_PW
-        rabbitmqctl set_permissions -p /chef chef '.*' '.*' '.*'
-        wget -O /tmp/chef_server.deb https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.0.8-1.ubuntu.12.04_amd64.deb
-        dpkg -i /tmp/chef_server.deb
-        mkdir /etc/chef-server
-        cat > /etc/chef-server/chef-server.rb <<EOF
-        nginx["ssl_port"] = 4000
-        nginx["non_ssl_port"] = 4080
-        nginx["enable_non_ssl"] = true
-        rabbitmq["enable"] = false
-        rabbitmq["password"] = "$CHEF_RMQ_PW"
-        bookshelf['url'] = "https://#{node['ipaddress']}:4000"
-        EOF
-        chef-server-ctl reconfigure
-        bash <(wget -O - http://opscode.com/chef/install.sh)
-        mkdir /root/.chef
-        cat > /root/.chef/knife.rb <<EOF
-        log_level                :info
-        log_location             STDOUT
-        node_name                'admin'
-        client_key               '/etc/chef-server/admin.pem'
-        validation_client_name   'chef-validator'
-        validation_key           '/etc/chef-server/chef-validator.pem'
-        chef_server_url          'https://localhost:4000'
-        cache_options( :path => '/root/.chef/checksums' )
-        cookbook_path            [ '/opt/rpcs/chef-cookbooks/cookbooks' ]
-        EOF
-        mkdir -p /opt/rpcs
-        git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/rpcs/chef-cookbooks
-        cd /opt/rpcs/chef-cookbooks
-        git submodule init
-        git checkout master
-        git submodule update
-        knife cookbook site download -f /tmp/cron.tar.gz cron 1.2.6 && tar xf /tmp/cron.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
-        knife cookbook site download -f /tmp/chef-client.tar.gz chef-client 3.0.6 && tar xf /tmp/chef-client.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
-        mkdir -p /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
-        curl http://cookbooks.howopenstack.org/rpc-support.tar.gz | tar zxf - -C /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
-        wget http://cookbooks.howopenstack.org/roles/rpc-support.rb -O /opt/rpcs/chef-cookbooks/roles/rpc-support.rb
-        knife cookbook upload -o /opt/rpcs/chef-cookbooks/cookbooks -a
-        knife role from file /opt/rpcs/chef-cookbooks/roles/*.rb
-        # Nova Network
-        curl -L --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)/" > rpcs.json
-        knife environment from file rpcs.json
-        export CHEF_SERVER_URL=https://$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}'):4000
-        knife bootstrap localhost -E rpcs -r 'role[allinone]'
+      user_data: 
+        replace:
+          template: |
+            # generate a key
+            ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ''
+            cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+            # install chef stuff
+            apt-get install -y rabbitmq-server git curl
+            export CHEF_RMQ_PW=$$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24)
+            rabbitmqctl add_vhost /chef
+            rabbitmqctl add_user chef $CHEF_RMQ_PW
+            rabbitmqctl set_permissions -p /chef chef '.*' '.*' '.*'
+            wget -O /tmp/chef_server.deb https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.0.8-1.ubuntu.12.04_amd64.deb
+            dpkg -i /tmp/chef_server.deb
+            mkdir /etc/chef-server
+            cat > /etc/chef-server/chef-server.rb <<EOF
+            nginx["ssl_port"] = 4000
+            nginx["non_ssl_port"] = 4080
+            nginx["enable_non_ssl"] = true
+            rabbitmq["enable"] = false
+            rabbitmq["password"] = "$$CHEF_RMQ_PW"
+            bookshelf['url'] = "https://#{node['ipaddress']}:4000"
+            EOF
+            chef-server-ctl reconfigure
+            bash <(wget -O - http://opscode.com/chef/install.sh)
+            mkdir /root/.chef
+            cat > /root/.chef/knife.rb <<EOF
+            log_level                :info
+            log_location             STDOUT
+            node_name                'admin'
+            client_key               '/etc/chef-server/admin.pem'
+            validation_client_name   'chef-validator'
+            validation_key           '/etc/chef-server/chef-validator.pem'
+            chef_server_url          'https://localhost:4000'
+            cache_options( :path => '/root/.chef/checksums' )
+            cookbook_path            [ '/opt/rpcs/chef-cookbooks/cookbooks' ]
+            EOF
+            mkdir -p /opt/rpcs
+            git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/rpcs/chef-cookbooks
+            cd /opt/rpcs/chef-cookbooks
+            git submodule init
+            git checkout master
+            git submodule update
+            knife cookbook site download -f /tmp/cron.tar.gz cron 1.2.6 && tar xf /tmp/cron.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
+            knife cookbook site download -f /tmp/chef-client.tar.gz chef-client 3.0.6 && tar xf /tmp/chef-client.tar.gz -C /opt/rpcs/chef-cookbooks/cookbooks
+            mkdir -p /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
+            curl http://cookbooks.howopenstack.org/rpc-support.tar.gz | tar zxf - -C /opt/rpcs/chef-cookbooks/cookbooks/rpc-support
+            wget http://cookbooks.howopenstack.org/roles/rpc-support.rb -O /opt/rpcs/chef-cookbooks/roles/rpc-support.rb
+            knife cookbook upload -o /opt/rpcs/chef-cookbooks/cookbooks -a
+            knife role from file /opt/rpcs/chef-cookbooks/roles/*.rb
+            # Nova Network
+            curl -L --silent https://github.com/rsoprivatecloud/openstack-chef-deploy/raw/master/environments/grizzly.json | sed "s/__CHANGE_ME__/${admin_password}/" > rpcs.json
+            IP="`ifconfig eth0 | grep -i "inet addr" | awk '{print $$2}' | awk -F ":" '{print $$2}'`/32"
+            sed -i "s/10.240.0.0\/24/$$IP/g" rpcs.json
+            knife environment from file rpcs.json
+            export CHEF_SERVER_URL=https://$$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}'):4000
+            knife bootstrap localhost -E rpcs -r 'role[allinone]'
+          params:
+            admin_password: { get_param: admin_password }
 
 outputs:
   
