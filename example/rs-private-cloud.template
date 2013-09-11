@@ -25,7 +25,7 @@ resources:
       name: Rackspace Private Cloud Server
       key_name: { get_param: key_name }
       user_data: 
-        replace:
+        str_replace:
           template: |
             # generate a key
             ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ''
