@@ -8,25 +8,28 @@ parameters:
   flavor:
     description: Rackspace Cloud Server flavor
     type: String 
-    default: "4"
+    default: 2GB Standard Instance
     constraints:
-    - allowed_values: ["3", "4", "5", "6", "7", "8"]
-      description: must be a valid Rackspace Cloud Server flavor and be large enough to run devstack
+    - allowed_values:
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor large enough to run devstack
 
   image:
-    # currently requires an image id; refactor in-progress
-    # to accept image names as well as ids
     type: String
     description: Server image id to use
-    default: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
     constraints:
-    # only tested on Ubuntu images so far
     - allowed_values:
-      - 25a5f2e8-f522-4fe0-b0e0-dbaa62405c25  # CentOS 6.4
-      - e0c3a14d-b1dc-451b-ade4-d419501aa121  # Red Hat Enterprise Linux 6.4
-      - 23b564c9-c3e6-49f9-bc68-86c7a9ab5018  # Ubuntu 12.04 LTS (Precise Pangolin)
-      - 427e993a-79b4-46b4-a0e6-8adec781a360  # Fedora 18 (Spherical Cow)
-      description: must be an ID of a Devstack-supported distro
+      - CentOS 6.4
+      - Red Hat Enterprise Linux 6.4
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Fedora 18 (Spherical Cow)
+      description: must be a Devstack-supported distro
 
   server_name:
     description: the instance name
@@ -113,9 +116,9 @@ resources:
             #!/bin/bash -v
 
             # Install requirements
-            image=$image
+            image="$image"
             packages="git emacs nmap"
-            if [[ $$image == "23b564c9-c3e6-49f9-bc68-86c7a9ab5018" ]]; then
+            if [[ $$image == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
                 apt-get install -y $$packages
             else
                 yum -y install $$packages
