@@ -8,7 +8,7 @@ parameters:
   flavor:
     description: Rackspace Cloud Server flavor
     type: String 
-    default: "2"
+    default: 1GB Standard Instance
     constraints:
     - allowed_values:
       - 512MB Standard Instance
