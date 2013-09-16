@@ -8,17 +8,15 @@ description: |
 parameters:
 
   web_node_flavor:
-    description: flavor id for the web server instances
+    description: flavor for the web server instances
     Type: String
-    Default: "4"
+    default: 4GB Standard Instance
     constraints:
     - allowed_values:
-      - "3"
-      - "4"
-      - "5"
-      - "6"
-      - "7"
-      - "8"
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
       description: must be a valid Rackspace Cloud Server flavor.
 
   image:
