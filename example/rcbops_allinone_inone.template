@@ -17,20 +17,10 @@ parameters:
       - 30GB Standard Instance
       description: Must be a valid Rackspace Cloud Server flavor large enough to run Chef and Openstack, Default is 4GB.
 
-  image:
-    type: String
-    description: Server image id to use
-    default: Ubuntu 12.04 LTS (Precise Pangolin)
-    constraints:
-    - allowed_values:
-      - Ubuntu 12.04 LTS (Precise Pangolin)
-      description: Builds on ubuntu 12.04 LTS x86_64.
-
   server_name:
     type: String
     default: RackspacePrivateCloudDemo
     description: The Instance Name
-
 
 resources:
 
@@ -38,24 +28,11 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: { get_param: image }
+      image: Ubuntu 12.04 LTS (Precise Pangolin)
       name: { get_param: server_name }
       user_data: |
-        #!/bin/bash -v
-        # Copyright [2013] [Kevin Carter]
-        # 
-        # Licensed under the Apache License, Version 2.0 (the "License");
-        # you may not use this file except in compliance with the License.
-        # You may obtain a copy of the License at
-        # 
-        #     http://www.apache.org/licenses/LICENSE-2.0
-        # 
-        # Unless required by applicable law or agreed to in writing, software
-        # distributed under the License is distributed on an "AS IS" BASIS,
-        # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        # See the License for the specific language governing permissions and
-        # limitations under the License.
-
+        #!/usr/bin/env bash
+        set -v
         # Make the system key used for bootstrapping self
         yes '' | ssh-keygen -t rsa -f /root/.ssh/id_rsa -N ''
         pushd /root/.ssh/
