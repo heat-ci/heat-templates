@@ -80,6 +80,9 @@ resources:
             rabbitmqctl add_user chef $${CHEF_RMQ_PW}
             rabbitmqctl set_permissions -p /chef chef '.*' '.*' '.*'
 
+            # Grab existing Chef Cookie
+            export CHEF_COOKIE=$(cat /var/lib/rabbitmq/.erlang.cookie)
+
             # Download/Install Chef
             wget -O /tmp/chef_server.deb 'https://www.opscode.com/chef/download-server?p=ubuntu&pv=12.04&m=x86_64'
             dpkg -i /tmp/chef_server.deb
@@ -120,7 +123,7 @@ resources:
             git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/allinoneinone/chef-cookbooks
             pushd /opt/allinoneinone/chef-cookbooks
             git submodule init
-            git checkout v4.1.0
+            git checkout v4.1.2
             git submodule update
             knife cookbook site download -f /tmp/cron.tar.gz cron 1.2.6 && tar xf /tmp/cron.tar.gz -C /opt/allinoneinone/chef-cookbooks/cookbooks
             knife cookbook site download -f /tmp/chef-client.tar.gz chef-client 3.0.6 && tar xf /tmp/chef-client.tar.gz -C /opt/allinoneinone/chef-cookbooks/cookbooks
@@ -164,6 +167,8 @@ resources:
             override = env['override_attributes']
             users = override['keystone']['users']
             users['admin']['password'] = '${admin_pass}'
+            rabbit = override['rabbitmq'] = {}
+            rabbit['erlang_cookie'] = "${CHEF_COOKIE}"
             override['glance']['image_upload'] = True
             override['nova'].update({'libvirt': {'virt_type': "qemu"}})
             override['developer_mode'] = True
@@ -171,7 +176,6 @@ resources:
             override['osops_networks']['public'] = network
             override['osops_networks']['nova'] = network
             override['mysql']['root_network_acl'] = "%"
-
             override.pop('hardware', None)
             override.pop('enable_monit', None)
             override.pop('monitoring', None)
