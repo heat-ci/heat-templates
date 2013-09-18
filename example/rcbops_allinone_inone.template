@@ -157,7 +157,7 @@ resources:
                 else:
                     return '127.0.0.0/8'
 
-            network = get_network(interface='eth2')
+            network = get_network(interface='eth0')
 
             with open('allinoneinone.json.original', 'rb') as rcbops:
                 env = json.loads(rcbops.read())
