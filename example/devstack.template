@@ -101,6 +101,11 @@ parameters:
     - allowed_values: ["true", "false"]
       description: must be either "true" or "false"
 
+  devstack_branch:
+    default: "master"
+    description: Devstack branch to clone
+    type: String
+
 resources:
 
   devstack_server: 
@@ -125,7 +130,7 @@ resources:
             fi
 
             # Configure and install Devstack
-            git clone git://github.com/openstack-dev/devstack.git
+            git clone git://github.com/openstack-dev/devstack.git -b ${devstack_branch}
             cd devstack
             if [[ $enable_heat == "true" ]]; then
                 echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
@@ -173,6 +178,7 @@ resources:
             enable_heat: { get_param: enable_heat }
             key_name: { get_param: key_name }
             image: { get_param: image }
+            devstack_branch: { get_param: devstack_branch }
 
 outputs:
   
