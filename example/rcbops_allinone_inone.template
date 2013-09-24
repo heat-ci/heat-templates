@@ -26,7 +26,7 @@ parameters:
     - length:
         min: 1
         max: 25
-    description: Password MUST be between 1 - 25 characters.
+      description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for OpenStack.
 
@@ -39,7 +39,7 @@ parameters:
     - length:
         min: 1
         max: 25
-    description: Password MUST be between 1 - 25 characters.
+      description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for Chef Server.
 
@@ -52,7 +52,7 @@ parameters:
     - length:
         min: 1
         max: 25
-    description: Password MUST be between 1 - 25 characters.
+      description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password used for RabbitMQ.
 
