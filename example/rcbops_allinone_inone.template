@@ -62,6 +62,7 @@ parameters:
     default: v4.1.2
     constraints:
     - allowed_values:
+      - v4.1.2
       - v4.1.1
       - v4.1.0
       - master
