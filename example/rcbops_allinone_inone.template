@@ -1,4 +1,4 @@
-heat_template_version: 2013-09-24
+heat_template_version: 2013-05-23
 
 description: |
   A template implementation of a resource that provides an Openstack installation using the Rackspace Private Cloud Software.
@@ -28,7 +28,7 @@ parameters:
         max: 25
     description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
-    description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for OpenStack.
+      description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for OpenStack.
 
   chef_admin_pass:
     default: secrete
@@ -41,7 +41,7 @@ parameters:
         max: 25
     description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
-    description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for Chef Server.
+      description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for Chef Server.
 
   rabbit_pass:
     default: secrete
@@ -54,7 +54,7 @@ parameters:
         max: 25
     description: Password MUST be between 1 - 25 characters.
     - allowed_pattern: "[a-zA-Z0-9]*"
-    description : Only Alpha-Numeric characters are allowed. This is the admin password used for RabbitMQ.
+      description : Only Alpha-Numeric characters are allowed. This is the admin password used for RabbitMQ.
 
   cookbook_version:
     description: Cookbooks used for the Rackspace Private Cloud Deployment.
