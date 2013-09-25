@@ -2,58 +2,68 @@
   "templates": [
     {
       "id": 1,
-      "name":"Single Instance Redis Server (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/redis.template"
+      "name": "Single Instance Redis Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/redis.template"
     },
     {
       "id": 2,
-      "name":"Multi-node Wordpress (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/wordpress-multi.template"
+      "name": "Multi-node Wordpress (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/wordpress-multi.template"
     },
     {
       "id": 3,
-      "name":"PHP Application Server (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/php-app.template"
+      "name": "PHP Application Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/php-app.template"
     },
     {
       "id": 4,
-      "name":"Devstack (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/devstack.template"
+      "name": "Devstack (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/devstack.template"
     },
     {
       "id": 5,
-      "name":"MySQL Serveri (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/mysql.template"
+      "name": "MySQL Serveri (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/mysql.template"
     },
     {
       "id": 6,
-      "name":"Ruby on Rails Application Serveri (Linux)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/ruby-on-rails.template"
+      "name": "Ruby on Rails Application Serveri (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/ruby-on-rails.template"
     },
     {
       "id": 7,
-      "name":"Single-node Wordpress (Windows)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/wordpress-single-winserver.template"
+      "name": "Single-node Wordpress (Windows)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/wordpress-single-winserver.template"
     },
     {
       "id": 8,
-      "name":"Multi-node Wordpress (Windows + LB + Cloud DB)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/wordpress-multinode-windows.template"
+      "name": "Multi-node Wordpress (Windows + LB + Cloud DB)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/wordpress-multinode-windows.template"
     },
     {
       "id": 9,
-      "name":"Single-node Wordpress (Windows + Cloud DB)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/wordpress-winserver-clouddb.template"
+      "name": "Single-node Wordpress (Windows + Cloud DB)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/wordpress-winserver-clouddb.template"
     },
     {
       "id": 10,
-      "name":"DotNetNuke Application (Windows)",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/dotnetnuke.template"
+      "name": "DotNetNuke Application (Windows)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dotnetnuke.template"
     },
     {
       "id": 11,
-      "name":"All-in-one Rackspace Private Cloud",
-      "url":"https://raw.github.com/heat-ci/heat-prod-templates/master/example/rcbops_allinone_inone.template"
+      "name": "All-in-one Rackspace Private Cloud",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/rcbops_allinone_inone.template"
+    },
+    {
+      "id": 12,
+      "name": "Single-instance MongoDB server",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/mongodb.template"
+    },
+    {
+      "id": 13,
+      "name": "Repose Server",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/repose.template"
     }
   ]
 }
