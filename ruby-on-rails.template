@@ -10,14 +10,7 @@ parameters:
     type: String 
     default: 1GB Standard Instance
     constraints:
-    - allowed_values:
-      - 512MB Standard Instance
-      - 1GB Standard Instance
-      - 2GB Standard Instance
-      - 4GB Standard Instance
-      - 8GB Standard Instance
-      - 15GB Standard Instance
-      - 30GB Standard Instance
+    - allowed_values: ["2", "3", "4", "5", "6", "7", "8"]
       description: must be a valid Rackspace Cloud Server flavor.
 
   server_name:
@@ -50,7 +43,7 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: Fedora 17 (Beefy Miracle)
+      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
