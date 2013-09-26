@@ -54,9 +54,8 @@ resources:
             #!/bin/bash -v
 
             # Install requirements
-            image="$image"
             packages="git openjdk-7-jre "
-            if [[ $image == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
+            if [[ "%image%" == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
                 apt-get install -y $packages
             else
                 yum -y install $packages
