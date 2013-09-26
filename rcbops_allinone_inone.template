@@ -437,8 +437,6 @@ resources:
             "%chef_admin_pass%": { get_param: chef_admin_pass }
             "%os_admin_pass%": { get_param: os_admin_pass }
             "%rabbit_pass%": { get_param: rabbit_pass }
-            "%flavor%": { get_param: flavor }
-            "%server_name%": { get_param: server_name }
 
 outputs:
 
