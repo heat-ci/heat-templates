@@ -60,7 +60,8 @@ resources:
 
             # Configure and install REPOSE 
             git clone git://github.com/rackerlabs/repose_contrib.git
-            cd repose_contrib/quick_deploy; ./repose.sh install
+            ./repose_contrib/quick_deploy/repose.sh install &
+            disown
           params:
             "%image%": { get_param: image }
 
