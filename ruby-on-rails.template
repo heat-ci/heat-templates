@@ -58,15 +58,15 @@ resources:
           template: |
             #!/bin/bash -v
             yum -y install ruby-devel rubygem-rails sqlite-devel git
-            iptables -I INPUT -p tcp --dport $http_port -j ACCEPT
+            iptables -I INPUT -p tcp --dport %http_port% -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
-            rails new $rails_path
-            cd $rails_path
+            rails new %rails_path%
+            cd %rails_path%
             bundle install
-            ./script/rails server -p $http_port -d
+            ./script/rails server -p %http_port% -d
           params:
-            rails_path: { get_param: rails_path }
-            http_port: { get_param: http_port }
+            "%rails_path%": { get_param: rails_path }
+            "%http_port%": { get_param: http_port }
 
 outputs:
   
@@ -81,9 +81,9 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://${ip}:${port}/
+        template: http://%ip%:%port%/
         params:
-          ip: { get_attr: [ rails_server, PublicIp ] }
-          port: { get_param: http_port }
+          "%ip%": { get_attr: [ rails_server, PublicIp ] }
+          "%port%": { get_param: http_port }
     description: URL for Rails app
 

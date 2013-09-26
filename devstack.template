@@ -121,33 +121,32 @@ resources:
             #!/bin/bash -v
 
             # Install requirements
-            image="$image"
             packages="git emacs nmap"
-            if [[ $$image == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
-                apt-get install -y $$packages
+            if [[ "%image%" == "23b564c9-c3e6-49f9-bc68-86c7a9ab5018" ]]; then
+                apt-get install -y $packages
             else
-                yum -y install $$packages
+                yum -y install $packages
             fi
 
             # Configure and install Devstack
-            git clone git://github.com/openstack-dev/devstack.git -b ${devstack_branch}
+            git clone git://github.com/openstack-dev/devstack.git -b "%devstack_branch%"
             cd devstack
-            if [[ $enable_heat == "true" ]]; then
+            if [[ "%enable_heat%" == "true" ]]; then
                 echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
             fi
-            if [[ -n $admin_pass ]]; then
-                echo "ADMIN_PASSWORD=${admin_pass}" >> localrc
+            if [[ -n "%admin_pass%" ]]; then
+                echo "ADMIN_PASSWORD=%admin_pass%" >> localrc
             fi
-            if [[ -n $mysql_pass ]]; then
-                echo "MYSQL_PASSWORD=${mysql_pass}" >> localrc
+            if [[ -n "%mysql_pass%" ]]; then
+                echo "MYSQL_PASSWORD=%mysql_pass%" >> localrc
             fi
-            if [[ -n $rabbit_pass ]]; then
-                echo "RABBIT_PASSWORD=${rabbit_pass}" >> localrc
+            if [[ -n "%rabbit_pass%" ]]; then
+                echo "RABBIT_PASSWORD=%rabbit_pass%" >> localrc
             fi
-            if [[ -n $service_pass ]]; then
-                echo "SERVICE_PASSWORD=${service_pass}" >> localrc
+            if [[ -n "%service_pass%" ]]; then
+                echo "SERVICE_PASSWORD=%service_pass%" >> localrc
             fi
-            echo "SERVICE_TOKEN=$$(openssl rand -hex 10)" >> localrc
+            echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
             ./stack.sh
 
             # Add the SSH key to the stack user
@@ -156,10 +155,10 @@ resources:
             chmod 400 ~stack/.ssh/authorized_keys
 
             # Add the key to nova
-            nova --os-username admin --os-password $admin_pass --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add $key_name --pub-key ~stack/.ssh/authorized_keys
+            nova --os-username admin --os-password "%admin_pass%" --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add "%key_name%" --pub-key ~stack/.ssh/authorized_keys
 
             # Heat-specific configs below
-            [[ $enable_heat != "true" ]] && exit 0
+            [[ "%enable_heat%" != "true" ]] && exit 0
 
             # Download convenience functions for Heat
             su -l stack -c "curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile"
@@ -171,14 +170,14 @@ resources:
             glance_create F18-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-i386-cfntools.qcow2
             glance_create F18-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2
           params:
-            mysql_pass: { get_param: mysql_pass }
-            admin_pass: { get_param: admin_pass }
-            rabbit_pass: { get_param: rabbit_pass }
-            service_pass: { get_param: service_pass }
-            enable_heat: { get_param: enable_heat }
-            key_name: { get_param: key_name }
-            image: { get_param: image }
-            devstack_branch: { get_param: devstack_branch }
+            "%mysql_pass%": { get_param: mysql_pass }
+            "%admin_pass%": { get_param: admin_pass }
+            "%rabbit_pass%": { get_param: rabbit_pass }
+            "%service_pass%": { get_param: service_pass }
+            "%enable_heat%": { get_param: enable_heat }
+            "%key_name%": { get_param: key_name }
+            "%image%": { get_param: image }
+            "%devstack_branch%": { get_param: devstack_branch }
 
 outputs:
   

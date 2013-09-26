@@ -58,9 +58,9 @@ outputs:
   ssh:
     value: 
       str_replace:
-        template: ssh root@$host
+        template: ssh root@%host%
         params:
-          host:
+          "%host%":
             get_attr:
             - redis
             - PublicIp
@@ -68,9 +68,9 @@ outputs:
   verify:
     value:
       str_replace:
-        template: redis-cli -h $host ping
+        template: redis-cli -h %host% ping
         params:
-          host:
+          "%host%":
             get_attr:
             - redis
             - PublicIp

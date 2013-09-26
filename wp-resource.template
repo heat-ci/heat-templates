@@ -90,15 +90,15 @@ resources:
             yum -y install mysql httpd wordpress
             sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
             sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
-            sed --in-place --e "s/localhost/$dbhost/" --e "s/database_name_here/$dbname/" --e "s/username_here/$dbuser/" --e "s/password_here/$dbpass/" /usr/share/wordpress/wp-config.php
+            sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
             systemctl start httpd.service
             iptables -I INPUT -p tcp --dport 80 -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
           params:
-            dbhost: { get_param: db_host }
-            dbname: { get_param: db_name }
-            dbuser: { get_param: db_username }
-            dbpass: { get_param: db_password }
+            "%dbhost%": { get_param: db_host }
+            "%dbname%": { get_param: db_name }
+            "%dbuser%": { get_param: db_username }
+            "%dbpass%": { get_param: db_password }
 
 outputs:
   
@@ -113,8 +113,8 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://$ip/wordpress
+        template: http://%ip%/wordpress
         params:
-          ip: { get_attr: [ wordpress, PublicIp ] }
+          "%ip%": { get_attr: [ wordpress, PublicIp ] }
     description: URL for Wordpress wiki
 

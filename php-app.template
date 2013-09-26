@@ -54,9 +54,9 @@ resources:
             systemctl enable httpd.service
             iptables -I INPUT -p tcp --dport 80 -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
-            git clone $git_url /var/www/html/
+            git clone %git_url% /var/www/html/
           params:
-            git_url: { get_param: git_url }
+            "%git_url%": { get_param: git_url }
 
 outputs:
   
@@ -71,8 +71,8 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://$ip/
+        template: http://%ip%/
         params:
-          ip: { get_attr: [ php_app, PublicIp ] }
+          "%ip%": { get_attr: [ php_app, PublicIp ] }
     description: URL for PHP app
 

@@ -51,21 +51,21 @@ resources:
       user_data:
         str_replace:
           template: |
-            $$source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
-            $$destination = "webpi.msi"
-            $$wc = New-Object System.Net.WebClient
-            $$wc.DownloadFile($$source, $$destination)
+            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+            $destination = "webpi.msi"
+            $wc = New-Object System.Net.WebClient
+            $wc.DownloadFile($source, $destination)
             Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
             echo "AppPath[@]Default Web Site/dotnetnuke" > dnn.app
             echo "sqldbpassword[@]${sqlpassword}" >> dnn.app
-            $$tmpprofile = $$env:userprofile
-            $$env:userprofile = "c:\users\administrator"
-            $$wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
-            Start-Process $$wpicmd -ArgumentList "/Install /Application:dotnetnuke@dnn.app /SQLPassword:${sqlpassword} /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+            $tmpprofile = $env:userprofile
+            $env:userprofile = "c:\users\administrator"
+            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
+            Start-Process $wpicmd -ArgumentList "/Install /Application:dotnetnuke@dnn.app /SQLPassword:%sqlpassword% /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
             Start-Process 'dism' -ArgumentList "/online /enable-feature /featurename:IIS-ASPNET45 /all" -NoNewWindow -Wait
-            $$env:userprofile = $$tmpprofile
+            $env:userprofile = $tmpprofile
           params:
-            sqlpassword: { get_param: sql_password }
+            "%sqlpassword%": { get_param: sql_password }
 
 
 outputs:
@@ -77,7 +77,7 @@ outputs:
   website_url:
     value:
       str_replace:
-        template: http://$ip/dotnetnuke/default.aspx
+        template: http://%ip%/dotnetnuke/default.aspx
         params:
-          ip: { get_attr: [ rs_windows_server, PublicIp ] }
+          "%ip%": { get_attr: [ rs_windows_server, PublicIp ] }
     description: URL for Wordpress site
