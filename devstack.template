@@ -118,7 +118,7 @@ resources:
       user_data:
         str_replace:
           template: |
-            #!/bin/bash -v
+            #!/bin/bash -x
 
             # Install requirements
             image="$image"
@@ -130,6 +130,17 @@ resources:
             fi
 
             # Configure and install Devstack
+            groupadd stack
+            useradd -g stack -s /bin/bash -d /opt/stack -m stack
+            echo "stack ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+            cat >~stack/install-devstack.sh<<EOF
+            #!/bin/bash -x
+
+            # Let parent process know install is done
+            trap "sudo rm -f /tmp/devstack-install-in-progress" EXIT
+
+            cd ~stack
             git clone git://github.com/openstack-dev/devstack.git -b ${devstack_branch}
             cd devstack
             if [[ $enable_heat == "true" ]]; then
@@ -148,11 +159,12 @@ resources:
                 echo "SERVICE_PASSWORD=${service_pass}" >> localrc
             fi
             echo "SERVICE_TOKEN=$$(openssl rand -hex 10)" >> localrc
-            ./stack.sh
+
+            sudo -u stack ~stack/devstack/stack.sh
 
             # Add the SSH key to the stack user
             mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
-            tail -n1 ~/.ssh/authorized_keys > ~stack/.ssh/authorized_keys
+            sudo tail -n1 /root/.ssh/authorized_keys > ~stack/.ssh/authorized_keys
             chmod 400 ~stack/.ssh/authorized_keys
 
             # Add the key to nova
@@ -162,7 +174,7 @@ resources:
             [[ $enable_heat != "true" ]] && exit 0
 
             # Download convenience functions for Heat
-            su -l stack -c "curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile"
+            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile
             source ~stack/.bash_profile
 
             # Download & install prebuilt Heat JEOS images
@@ -170,6 +182,14 @@ resources:
             glance_create F17-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-x86_64-cfntools.qcow2
             glance_create F18-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-i386-cfntools.qcow2
             glance_create F18-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2
+            EOF
+            chmod +x ~stack/install-devstack.sh
+
+            touch /tmp/devstack-install-in-progress
+            sudo -u stack ~stack/install-devstack.sh &
+            while [[ -f /tmp/devstack-install-in-progress ]]; do
+                sleep 5
+            done
           params:
             mysql_pass: { get_param: mysql_pass }
             admin_pass: { get_param: admin_pass }
