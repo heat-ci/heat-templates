@@ -468,11 +468,11 @@ resources:
             # Exit Zero
             exit 0
           params:
-            %cookbook_version%: { get_param: cookbook_version }
-            %chef_admin_pass%: { get_param: chef_admin_pass }
-            %os_admin_pass%: { get_param: os_admin_pass }
-            %rabbit_pass%: { get_param: rabbit_pass }
-            %system_pass%: { get_param: system_pass }
+            "%cookbook_version%": { get_param: cookbook_version }
+            "%chef_admin_pass%": { get_param: chef_admin_pass }
+            "%os_admin_pass%": { get_param: os_admin_pass }
+            "%rabbit_pass%": { get_param: rabbit_pass }
+            "%system_pass%": { get_param: system_pass }
 
 outputs:
 
