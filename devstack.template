@@ -136,9 +136,6 @@ resources:
             cat >~stack/install-devstack.sh<<EOF
             #!/bin/bash -x
 
-            # Let parent process know install is done
-            trap "sudo rm -f /tmp/devstack-install-in-progress" EXIT
-
             cd ~stack
             git clone git://github.com/openstack-dev/devstack.git -b "%devstack_branch%"
             cd devstack
@@ -183,12 +180,7 @@ resources:
             glance_create F18-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2
             EOF
             chmod +x ~stack/install-devstack.sh
-
-            touch /tmp/devstack-install-in-progress
-            sudo -u stack ~stack/install-devstack.sh &
-            while [[ -f /tmp/devstack-install-in-progress ]]; do
-                sleep 5
-            done
+            sudo -u stack ~stack/install-devstack.sh
           params:
             "%mysql_pass%": { get_param: mysql_pass }
             "%admin_pass%": { get_param: admin_pass }
