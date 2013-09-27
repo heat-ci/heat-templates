@@ -30,6 +30,19 @@ parameters:
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for OpenStack.
 
+  system_pass:
+    default: secrete
+    hidden: true
+    description: Password for the System User
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 25
+      description: Password MUST be between 1 - 25 characters.
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : Only Alpha-Numeric characters are allowed. This is the System user password.
+
   chef_admin_pass:
     default: secrete
     hidden: true
@@ -87,16 +100,19 @@ resources:
             # Here are the script Override Values.
             # ============================================================================
             # Set this to override the chef default password, DEFAULT is "Random Things"
-            CHEF_PW="%os_admin_pass%"
+            CHEF_PW="$os_admin_pass"
 
             # Set this to override the RabbitMQ Password, DEFAULT is "Random Things"
-            RMQ_PW="%rabbit_pass%"
+            RMQ_PW="$rabbit_pass"
 
             # Set this to override the Openstack Admin Password, DEFAULT is "Random Things"
-            NOVA_PW="%chef_admin_pass%"
+            NOVA_PW="$chef_admin_pass"
 
             # Set this to override the Cookbook version, DEFAULT is "v4.1.2"
-            COOKBOOK_VERSION="%cookbook_version%"
+            COOKBOOK_VERSION="$cookbook_version"
+
+            # Set this to override the system users Password, DEFAULT is the NOVA_PW
+            SYSTEM_PW=$system_pass
 
             # Set this to override the Management Interface, DEFAULT is "eth0"
             # MANAGEMENT_INTERFACE=""
@@ -129,21 +145,24 @@ resources:
             apt-get install -y rabbitmq-server git curl lvm2
 
             # Chef Server Password
-            CHEF_PW=${CHEF_PW:-$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
+            CHEF_PW=$${CHEF_PW:-$$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
 
             # Set Rabbit Pass
-            RMQ_PW=${RMQ_PW:-$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
+            RMQ_PW=$${RMQ_PW:-$$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
 
             # Set Admin Pass
-            NOVA_PW=${NOVA_PW:-$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
+            NOVA_PW=$${NOVA_PW:-$$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
+
+            # Set the system Pass
+            SYSTEM_PW=$${SYSTEM_PW:-$${NOVA_PW}}
 
             # Configure Rabbit
             rabbitmqctl add_vhost /chef
-            rabbitmqctl add_user chef ${RMQ_PW}
+            rabbitmqctl add_user chef $${RMQ_PW}
             rabbitmqctl set_permissions -p /chef chef '.*' '.*' '.*'
 
             # Grab existing Chef Cookie
-            CHEF_COOKIE=$(cat /var/lib/rabbitmq/.erlang.cookie)
+            CHEF_COOKIE=$$(cat /var/lib/rabbitmq/.erlang.cookie)
 
             # Download/Install Chef
             wget -O /tmp/chef_server.deb 'https://www.opscode.com/chef/download-server?p=ubuntu&pv=12.04&m=x86_64'
@@ -156,8 +175,8 @@ resources:
             nginx["non_ssl_port"] = 4080
             nginx["enable_non_ssl"] = true
             rabbitmq["enable"] = false
-            rabbitmq["password"] = "${RMQ_PW}"
-            chef_server_webui['web_ui_admin_default_password'] = "${CHEF_PW}"
+            rabbitmq["password"] = "$${RMQ_PW}"
+            chef_server_webui['web_ui_admin_default_password'] = "$${CHEF_PW}"
             bookshelf['url'] = "https://#{node['ipaddress']}:4000"
             EOF
 
@@ -186,7 +205,7 @@ resources:
             git clone -b grizzly git://github.com/rcbops/chef-cookbooks.git /opt/allinoneinone/chef-cookbooks
             pushd /opt/allinoneinone/chef-cookbooks
             git submodule init
-            git checkout ${COOKBOOK_VERSION:-v4.1.2}
+            git checkout $${COOKBOOK_VERSION:-v4.1.2}
             git submodule update
 
             # Get add-on Cookbooks
@@ -201,7 +220,7 @@ resources:
             knife role from file /opt/allinoneinone/chef-cookbooks/roles/*.rb
 
             # Set the Default Chef Environment
-            $(which python) << EOF
+            $$(which python) << EOF
             import json
             import subprocess
 
@@ -225,9 +244,9 @@ resources:
                     print('Interface "%s" not found, using "127.0.0.0/8".' % interface)
                     return '127.0.0.0/8'
 
-            management_network = get_network(interface="${MANAGEMENT_INTERFACE:-eth0}")
-            nova_network = get_network(interface="${NOVA_INTERFACE:-eth0}")
-            public_network = get_network(interface="${PUBLIC_INTERFACE:-eth0}")
+            management_network = get_network(interface="$${MANAGEMENT_INTERFACE:-eth0}")
+            nova_network = get_network(interface="$${NOVA_INTERFACE:-eth0}")
+            public_network = get_network(interface="$${PUBLIC_INTERFACE:-eth0}")
 
             cirros_img_url = 'https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img'
             ubuntu_img_url = 'http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img'
@@ -241,7 +260,7 @@ resources:
               'name': 'allinoneinone',
               'override_attributes': {
                 'rabbitmq': {
-                  'erlang_cookie': "${CHEF_COOKIE}"
+                  'erlang_cookie': "$${CHEF_COOKIE}"
                 },
                 'enable_monit': True,
                 'glance': {
@@ -267,7 +286,7 @@ resources:
                   ],
                   'users': {
                     'admin': {
-                      'password': "${NOVA_PW}",
+                      'password': "$${NOVA_PW}",
                       'role': {
                         'admin': ['admin']
                       }
@@ -294,7 +313,7 @@ resources:
                     'use_single_default_gateway': False
                   },
                   'libvirt': {
-                    'virt_type': "${VIRT_TYPE:-qemu}",
+                    'virt_type': "$${VIRT_TYPE:-qemu}",
                     'vncserver_listen': '0.0.0.0'
                   },
                   'network': {
@@ -341,28 +360,28 @@ resources:
             popd
 
             # Set the systems IP ADDRESS
-            SYS_IP=$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}')
+            SYS_IP=$$(ohai ipaddress | awk '/^ / {gsub(/ *\"/, ""); print; exit}')
 
             # Export Chef URL
-            export CHEF_SERVER_URL=https://${SYS_IP}:4000
+            export CHEF_SERVER_URL=https://$${SYS_IP}:4000
 
             # Set Cinder Data
-            CINDER=${CINDER_DEV:-"/opt/cinder.img"}
+            CINDER=$${CINDER_DEV:-"/opt/cinder.img"}
 
             # Make Cinder Device
-            if [ "${CINDER_DEV}" ];then
-                pvcreate ${CINDER}
-                vgcreate cinder-volumes ${CINDER}
-                sed -i "/$(echo ${CINDER} | sed 's/\//\\\//g')/ s/^/#\ /" /etc/fstab
+            if [ "$${CINDER_DEV}" ];then
+                pvcreate $${CINDER}
+                vgcreate cinder-volumes $${CINDER}
+                sed -i "/$$(echo $${CINDER} | sed 's/\//\\\//g')/ s/^/#\ /" /etc/fstab
             else
-                LOOP=$(losetup -f)
-                dd if=/dev/zero of=${CINDER} bs=1 count=0 seek=1000G
-                losetup ${LOOP} ${CINDER}
-                pvcreate ${LOOP}
-                vgcreate cinder-volumes ${LOOP}
+                LOOP=$$(losetup -f)
+                dd if=/dev/zero of=$${CINDER} bs=1 count=0 seek=1000G
+                losetup $${LOOP} $${CINDER}
+                pvcreate $${LOOP}
+                vgcreate cinder-volumes $${LOOP}
 
                 # Set Cinder Device as Persistent
-                echo -e 'LOOP=$(losetup -f)\nCINDER="/opt/cinder.img"\nlosetup ${LOOP} ${CINDER}' | tee /etc/rc.local
+                echo -e 'LOOP=$$(losetup -f)\nCINDER="/opt/cinder.img"\nlosetup $${LOOP} $${CINDER}' | tee /etc/rc.local
             fi
 
             # Begin Cooking
@@ -395,6 +414,10 @@ resources:
             sed -i '/pam_motd.so/ s/^/#\ /' /etc/pam.d/login
             sed -i '/pam_motd.so/ s/^/#\ /' /etc/pam.d/sshd
 
+            # Reset users Password post installation
+            IAM=$$(whoami)
+            echo -e "$${SYSTEM_PW}\n$${SYSTEM_PW}" | ($$(which passwd) $${IAM})
+
             # Notify the users and set new the MOTD
             echo -e "
 
@@ -403,15 +426,15 @@ resources:
             This is an Openstack Deployment based on the Rackspace Private Cloud Software.
             # ============================================================================
 
-            Your RabbitMQ Password is      : ${RMQ_PW}
-            Your OpenStack Password is     : ${NOVA_PW}
+            Your RabbitMQ Password is      : $${RMQ_PW}
+            Your OpenStack Password is     : $${NOVA_PW}
             Admin SSH key has been set as  : adminKey
-            Cinder volumes are located     : ${CINDER}
+            Cinder volumes are located     : $${CINDER}
             Openstack Cred File is located : /root/openrc
-            Horizon URL is                 : https://${SYS_IP}:443
+            Horizon URL is                 : https://$${SYS_IP}:443
 
-            Chef Server URL is             : ${CHEF_SERVER_URL}
-            Chef Server Password is        : ${CHEF_PW}
+            Chef Server URL is             : $${CHEF_SERVER_URL}
+            Chef Server Password is        : $${CHEF_PW}
             Your knife.rb is located       : /root/.chef/knife.rb
             All cookbooks are located      : /opt/allinoneinone
 
@@ -428,15 +451,28 @@ resources:
             You also have access to \"knife\" which can be used for modification and
             management of your Chef Server.
 
+
+            ================== NOTICE ==================
+                 Your ROOT password has been reset
+
+            Here are the details:
+
+            Username : $${IAM}
+            Password : $${SYSTEM_PW}
+
+
+            ** Please make a note of this! **
+
             "
 
             # Exit Zero
             exit 0
           params:
-            "%cookbook_version%": { get_param: cookbook_version }
-            "%chef_admin_pass%": { get_param: chef_admin_pass }
-            "%os_admin_pass%": { get_param: os_admin_pass }
-            "%rabbit_pass%": { get_param: rabbit_pass }
+            cookbook_version: { get_param: cookbook_version }
+            chef_admin_pass: { get_param: chef_admin_pass }
+            os_admin_pass: { get_param: os_admin_pass }
+            rabbit_pass: { get_param: rabbit_pass }
+            system_pass { get_param: system_pass }
 
 outputs:
 
