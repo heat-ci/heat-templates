@@ -30,6 +30,19 @@ parameters:
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password which will be used for OpenStack.
 
+  system_pass:
+    default: secrete
+    hidden: true
+    description: Password for the System User
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 25
+      description: Password MUST be between 1 - 25 characters.
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : Only Alpha-Numeric characters are allowed. This is the System user password.
+
   chef_admin_pass:
     default: secrete
     hidden: true
@@ -87,16 +100,19 @@ resources:
             # Here are the script Override Values.
             # ============================================================================
             # Set this to override the chef default password, DEFAULT is "Random Things"
-            CHEF_PW="%os_admin_pass%"
+            CHEF_PW="%chef_admin_pass%"
 
             # Set this to override the RabbitMQ Password, DEFAULT is "Random Things"
             RMQ_PW="%rabbit_pass%"
 
             # Set this to override the Openstack Admin Password, DEFAULT is "Random Things"
-            NOVA_PW="%chef_admin_pass%"
+            NOVA_PW="%os_admin_pass%"
 
             # Set this to override the Cookbook version, DEFAULT is "v4.1.2"
             COOKBOOK_VERSION="%cookbook_version%"
+
+            # Set this to override the system users Password, DEFAULT is the NOVA_PW
+            SYSTEM_PW="%system_pass%"
 
             # Set this to override the Management Interface, DEFAULT is "eth0"
             # MANAGEMENT_INTERFACE=""
@@ -136,6 +152,9 @@ resources:
 
             # Set Admin Pass
             NOVA_PW=${NOVA_PW:-$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 9)}
+
+            # Set the system Pass
+            SYSTEM_PW=${SYSTEM_PW:-${NOVA_PW}}
 
             # Configure Rabbit
             rabbitmqctl add_vhost /chef
@@ -395,6 +414,10 @@ resources:
             sed -i '/pam_motd.so/ s/^/#\ /' /etc/pam.d/login
             sed -i '/pam_motd.so/ s/^/#\ /' /etc/pam.d/sshd
 
+            # Reset users Password post installation
+            IAM=$(whoami)
+            echo -e "${SYSTEM_PW}\n${SYSTEM_PW}" | ($(which passwd) ${IAM})
+
             # Notify the users and set new the MOTD
             echo -e "
 
@@ -428,6 +451,18 @@ resources:
             You also have access to \"knife\" which can be used for modification and
             management of your Chef Server.
 
+
+            ================== NOTICE ==================
+                 Your ROOT password has been reset
+
+            Here are the details:
+
+            Username : ${IAM}
+            Password : ${SYSTEM_PW}
+
+
+            ** Please make a note of this! **
+
             "
 
             # Exit Zero
@@ -437,6 +472,7 @@ resources:
             "%chef_admin_pass%": { get_param: chef_admin_pass }
             "%os_admin_pass%": { get_param: os_admin_pass }
             "%rabbit_pass%": { get_param: rabbit_pass }
+            "%system_pass%": { get_param: system_pass }
 
 outputs:
 
