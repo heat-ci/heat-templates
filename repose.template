@@ -54,11 +54,10 @@ resources:
             #!/bin/bash -v
 
             # Install requirements
-            packages="git openjdk-7-jre "
             if [[ "%image%" == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
-                apt-get install -y $packages
+                apt-get install -y git openjdk-7-jre
             else
-                yum -y install $packages
+                yum -y install java-1.7.0-openjdk
             fi
 
             # Configure and install REPOSE 
