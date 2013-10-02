@@ -100,69 +100,44 @@ parameters:
 
 resources:
 
-  web_node_1: 
-    type: "Rackspace::Cloud::Server"
+  web_nodes:
+    type: OS::Heat::ResourceGroup
     properties:
-      flavor: { get_param: web_node_flavor }
-      # only tested on Fedora at the moment
-      image: Fedora 17 (Beefy Miracle)
-      name: { get_param: web_server_name }
-      key_name: { get_param: key_name }
-      user_data:
-        str_replace:
-          template: |
-            #!/bin/bash -v
-            yum -y install mysql httpd wordpress
-            sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
-            sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
-            sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
-            systemctl start httpd.service
-            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-            iptables-save > /etc/sysconfig/iptables
-          params:
-            "%dbhost%": { get_attr: [ db, hostname ] }
-            "%dbname%": { get_param: db_name }
-            "%dbuser%": { get_param: db_username }
-            "%dbpass%": { get_param: db_password }
-
-  web_node_2: 
-    type: "Rackspace::Cloud::Server"
-    properties:
-      flavor: { get_param: web_node_flavor }
-      # only tested on Fedora at the moment
-      image: Fedora 17 (Beefy Miracle)
-      name: { get_param: web_server_name }
-      key_name: { get_param: key_name }
-      user_data:
-        str_replace:
-          template: |
-            #!/bin/bash -v
-            yum -y install mysql httpd wordpress
-            sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
-            sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
-            sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
-            systemctl start httpd.service
-            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-            iptables-save > /etc/sysconfig/iptables
-          params:
-            "%dbhost%": { get_attr: [ db, hostname ] }
-            "%dbname%": { get_param: db_name }
-            "%dbuser%": { get_param: db_username }
-            "%dbpass%": { get_param: db_password }
+      count: 2
+      resource_def:
+        type: Rackspace::Cloud::Server
+        properties:
+          flavor: { get_param: web_node_flavor }
+          image: Fedora 17 (Beefy Miracle)
+          name: { get_param: web_server_name }
+          key_name: { get_param: key_name }
+          user_data:
+            str_replace:
+              template: |
+                #!/bin/bash -v
+                yum -y install mysql httpd wordpress
+                sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
+                sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
+                sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
+                systemctl start httpd.service
+                iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+                iptables-save > /etc/sysconfig/iptables
+              params:
+                "%dbhost%": { get_attr: [ db, hostname ] }
+                "%dbname%": { get_param: db_name }
+                "%dbuser%": { get_param: db_username }
+                "%dbpass%": { get_param: db_password }
 
   lb:
     type: "Rackspace::Cloud::LoadBalancer"
     properties:
       name:
         str_replace:
-          template: lb-%server_name%
+          template: "lb-%server_name%"
           params:
             "%server_name%": { get_param: web_server_name }
       nodes:
-      - address: { get_attr: [ web_node_1, PrivateIp ] }
-        port: 80
-        condition: ENABLED
-      - address: { get_attr: [ web_node_2, PrivateIp ] }
+      - addresses: { get_attr: [ web_nodes, PrivateIp ] }
         port: 80
         condition: ENABLED
       protocol: HTTP
@@ -191,7 +166,7 @@ resources:
       contentCaching: ENABLED
 
   db:
-    type: "Rackspace::Cloud::DBInstance"
+    type: Rackspace::Cloud::DBInstance
     properties:
       InstanceName: { get_param: db_instance_name }
       FlavorRef: { get_param: db_flavor }
@@ -209,7 +184,7 @@ outputs:
   wordpress_url:
     value: 
       str_replace:
-        template: http://%ip%/wordpress
+        template: "http://%ip%/wordpress"
         params:
           "%ip%": { get_attr: [ lb, PublicIp ] }
     description: Public URL for the wordpress blog
