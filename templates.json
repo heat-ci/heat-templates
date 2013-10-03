@@ -22,12 +22,12 @@
     },
     {
       "id": 5,
-      "name": "MySQL Serveri (Linux)",
+      "name": "MySQL Server (Linux)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/mysql.template"
     },
     {
       "id": 6,
-      "name": "Ruby on Rails Application Serveri (Linux)",
+      "name": "Ruby on Rails Application Server (Linux)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/ruby-on-rails.template"
     },
     {
