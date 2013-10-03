@@ -29,7 +29,7 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: 8378c2cc-8a69-4e28-ac24-a92dea1e0259
+      image: c63e20ad-6e3b-4e0b-943c-95cf3ba6c3a6
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data: |
