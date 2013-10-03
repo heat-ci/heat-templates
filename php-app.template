@@ -50,8 +50,8 @@ resources:
           template: |
             #!/bin/bash -v
             yum -y install httpd git php
-            systemctl start httpd.service
-            systemctl enable httpd.service
+            /etc/init.d/httpd start
+            chkconfig httpd on
             iptables -I INPUT -p tcp --dport 80 -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
             git clone %git_url% /var/www/html/
