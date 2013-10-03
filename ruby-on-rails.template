@@ -43,7 +43,7 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: c63e20ad-6e3b-4e0b-943c-95cf3ba6c3a6
+      image: b37fd1ad-6811-4714-941f-17a522b59af4  # Fedora 18
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
