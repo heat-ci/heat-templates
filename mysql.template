@@ -34,8 +34,8 @@ resources:
       key_name: { get_param: key_name }
       user_data: |
         yum -y install mysql-server
-        systemctl start mysqld.service
-        systemctl enable mysqld.service
+        chkconfig mysqld on
+        service mysqld start
 
 outputs:
 
