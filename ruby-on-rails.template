@@ -57,7 +57,7 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
-            yum -y install ruby-devel rubygem-rails sqlite-devel git
+            yum -y install ruby-devel rubygem-rails sqlite-devel git nodejs
             iptables -I INPUT -p tcp --dport %http_port% -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
             rails new %rails_path%
