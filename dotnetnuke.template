@@ -18,7 +18,7 @@ parameters:
     
   image:
     type: String
-    default: Windows Server 2012 (with updates)
+    default: Windows Server 2012
     description: Windows Server Image
   
   flavor:
