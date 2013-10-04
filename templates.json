@@ -26,6 +26,11 @@
       "url": "https://raw.github.com/heat-ci/heat-templates/master/mysql.template"
     },
     {
+      "id": 6,
+      "name": "Ruby on Rails Application Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/ruby-on-rails.template"
+    },
+    {
       "id": 7,
       "name": "Single-node Wordpress (Windows)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/wordpress-single-winserver.template"
