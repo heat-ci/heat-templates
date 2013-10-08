@@ -87,7 +87,7 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
-            yum -y install mysql httpd wordpress
+            yum -y install mysql-server httpd wordpress
             sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
             sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
             sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
