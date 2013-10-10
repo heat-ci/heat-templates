@@ -1,0 +1,78 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a PHP application server
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: 1GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 512MB Standard Instance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  server_name:
+    description: the instance name
+    type: String
+    default: PHP application
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+ 
+  git_url:
+    description: URL of a Git repository containing the PHP code.
+    type: String
+    required: true
+    
+
+resources:
+
+  php_app: 
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      image: CentOS 6.4
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            yum -y install httpd git php
+            /etc/init.d/httpd start
+            chkconfig httpd on
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
+            git clone %git_url% /var/www/html/
+          params:
+            "%git_url%": { get_param: git_url }
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ php_app, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ php_app, PrivateIp ] }
+    description: The private ip address of the server
+
+  website_url:
+    value:
+      str_replace:
+        template: http://%ip%/
+        params:
+          "%ip%": { get_attr: [ php_app, PublicIp ] }
+    description: URL for PHP app
+

@@ -1,0 +1,78 @@
+heat_template_version: 2013-05-23
+
+description: |
+ A template to deploy a "trial" demo version of REPOSE on to a cloud server.  This is NOT recommended for use as a production deployment. This is for quick deploy onto a test box. This template performs the setup operations described at http://wiki.openrepose.org/display/REPOSE/Repose+Sandbox  as of Sept 19, 2013
+
+parameters:
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: 2GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor large enough to run devstack
+
+  image:
+    type: String
+    description: Server image id to use
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    constraints:
+    - allowed_values:
+      - CentOS 6.4
+      - Red Hat Enterprise Linux 6.4
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Fedora 18 (Spherical Cow)
+      description: must be a Linux distro
+
+  server_name:
+    description: the instance name
+    type: String
+    default: REPOSE_Demo_Server
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+
+resources:
+  repose_server: 
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+
+            # Install requirements
+            if [[ "%image%" == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
+                apt-get install -y git openjdk-7-jre
+            else
+                yum -y install git java-1.7.0-openjdk
+            fi
+
+            # Configure and install REPOSE 
+            git clone git://github.com/rackerlabs/repose_contrib.git
+            ./repose_contrib/quick_deploy/repose.sh install &
+            disown
+          params:
+            "%image%": { get_param: image }
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ repose_server, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ repose_server, PrivateIp ] }
+    description: The private ip address of the server

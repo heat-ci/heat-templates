@@ -1,0 +1,89 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a Ruby on Rails server
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: 1GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 512MB Standard Instance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  server_name:
+    description: the instance name
+    type: String
+    default: Rails application
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+ 
+  rails_path:
+    description: Path to root directory of Rails application
+    type: String
+    default: /var/www/rails_app
+
+  http_port:
+    description: Port to start WEBrick on.
+    type: Number
+    default: 80
+    constraints:
+    - range:
+        min: 1
+        max: 65535
+
+resources:
+
+  rails_server: 
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      image: Fedora 19 (Schrodinger's Cat)
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            yum -y install ruby-devel rubygem-rails sqlite-devel git nodejs
+            iptables -I INPUT -p tcp --dport %http_port% -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
+            rails new %rails_path%
+            cd %rails_path%
+            bundle install
+            ./script/rails server -p %http_port% -d
+          params:
+            "%rails_path%": { get_param: rails_path }
+            "%http_port%": { get_param: http_port }
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ rails_server, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ rails_server, PrivateIp ] }
+    description: The private ip address of the server
+
+  website_url:
+    value:
+      str_replace:
+        template: http://%ip%:%port%/
+        params:
+          "%ip%": { get_attr: [ rails_server, PublicIp ] }
+          "%port%": { get_param: http_port }
+    description: URL for Rails app
+

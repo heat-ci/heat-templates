@@ -1,0 +1,77 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Simple template to deploy Redis on a cloud server
+
+parameters:
+  key-name:
+    type: String
+    description: Name of a nova ssh keypair to use for server access
+  image:
+    type: String
+    description: Server image id to use
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    constraints:
+    # only tested on Ubuntu images so far
+    - allowed_values:
+      - Ubuntu 10.04 LTS (Lucid Lynx)
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Ubuntu 12.10 (Quantal Quetzal)
+      - Ubuntu 13.04 (Raring Ringtail)
+      description: must be a valid Ubuntu image id
+  flavor:
+    description: Server flavor id to use
+    type: String
+    default: 1GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 512MB Standard Instance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance 
+      description: must be a valid Rackspace Cloud Server flavor.
+
+resources:
+  redis:
+    type: Rackspace::Cloud::Server
+    properties:
+      key_name: { get_param: key-name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      user_data: |
+        apt-get install -y build-essential
+        wget http://download.redis.io/releases/redis-2.6.16.tar.gz 
+        tar xzf redis-2.6.16.tar.gz 
+        cd redis-2.6.16 
+        make
+        make install
+        cd utils
+        yes '' | ./install_server.sh
+        cd ../../
+        rm -rf redis-2.6.16
+        rm redis-2.6.16.tar.gz
+
+outputs:
+  ssh:
+    value: 
+      str_replace:
+        template: ssh root@%host%
+        params:
+          "%host%":
+            get_attr:
+            - redis
+            - PublicIp
+    description: ssh to the redis host
+  verify:
+    value:
+      str_replace:
+        template: redis-cli -h %host% ping
+        params:
+          "%host%":
+            get_attr:
+            - redis
+            - PublicIp
+    description: verify the redis server via redis-cli
