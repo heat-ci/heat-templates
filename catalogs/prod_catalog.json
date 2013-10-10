@@ -54,6 +54,6 @@
       "id": 11,
       "name": "All-in-one Rackspace Private Cloud",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/prod/rcbops_allinone_inone.template"
-    },
+    }
   ]
 }
