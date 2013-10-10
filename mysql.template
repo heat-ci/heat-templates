@@ -36,13 +36,13 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: Fedora 17 (Beefy Miracle)
+      image: CentOS 6.4
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data: |
         yum -y install mysql-server
-        systemctl start mysqld.service
-        systemctl enable mysqld.service
+        chkconfig mysqld on
+        service mysqld start
 
 outputs:
 
