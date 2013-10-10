@@ -97,69 +97,41 @@ parameters:
 
 resources:
 
-  web_node_1: 
-    type: "Rackspace::Cloud::WinServer"
+  web_nodes: 
+    type: OS::Heat::ResourceGroup
     properties:
-      name: { get_param: web_server_name }
-      flavor: { get_param: web_node_flavor }
-      image: { get_param: image }
-      user_data:
-        str_replace:
-          template: |
-            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
-            $destination = "webpi.msi"
-            $wc = New-Object System.Net.WebClient
-            $wc.DownloadFile($source, $destination)
-            Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
-            echo "AppPath[@]Default Web Site/wordpress" > wp.app
-            echo "DbServer[@]%dbhost%" >> wp.app
-            echo "DbName[@]%dbname%" >> wp.app
-            echo "DbUsername[@]%dbuser%" >> wp.app
-            echo "DbPassword[@]%dbpassword%" >> wp.app
-            echo "DbAdminUsername[@]%dbuser%" >> wp.app
-            echo "DbAdminPassword[@]%dbpassword%" >> wp.app
-            $tmpprofile = $env:userprofile
-            $env:userprofile = "c:\users\administrator"
-            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
-            Start-Process $wpicmd -ArgumentList "/Install /Application:Wordpress@wp.app /MySQLPassword:%dbpassword% /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
-            $env:userprofile = $tmpprofile
-          params:
-            "%dbhost%": { get_attr: [ db, hostname ] }
-            "%dbname%": { get_param: db_name }
-            "%dbuser%": { get_param: db_username }
-            "%dbpassword%": { get_param: db_password }
-
-  web_node_2: 
-    type: "Rackspace::Cloud::WinServer"
-    properties:
-      name: { get_param: web_server_name }
-      flavor: { get_param: web_node_flavor }
-      image: { get_param: image }
-      user_data:
-        str_replace:
-          template: |
-            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
-            $destination = "webpi.msi"
-            $wc = New-Object System.Net.WebClient
-            $wc.DownloadFile($source, $destination)
-            Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
-            echo "AppPath[@]Default Web Site/wordpress" > wp.app
-            echo "DbServer[@]%dbhost%" >> wp.app
-            echo "DbName[@]%dbname%" >> wp.app
-            echo "DbUsername[@]%dbuser%" >> wp.app
-            echo "DbPassword[@]%dbpassword%" >> wp.app
-            echo "DbAdminUsername[@]%dbuser%" >> wp.app
-            echo "DbAdminPassword[@]%dbpassword%" >> wp.app
-            $tmpprofile = $env:userprofile
-            $env:userprofile = "c:\users\administrator"
-            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
-            Start-Process $wpicmd -ArgumentList "/Install /Application:Wordpress@wp.app /MySQLPassword:%dbpassword% /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
-            $env:userprofile = $tmpprofile
-          params:
-            dbhost: { get_attr: [ db, hostname ] }
-            dbname: { get_param: db_name }
-            dbuser: { get_param: db_username }
-            dbpassword: { get_param: db_password }
+      count: 2
+      resource_def:
+        type: Rackspace::Cloud::WinServer
+        properties:
+          name: { get_param: web_server_name }
+          flavor: { get_param: web_node_flavor }
+          image: { get_param: image }
+          user_data:
+            str_replace:
+              template: |
+                $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+                $destination = "webpi.msi"
+                $wc = New-Object System.Net.WebClient
+                $wc.DownloadFile($source, $destination)
+                Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
+                echo "AppPath[@]Default Web Site/wordpress" > wp.app
+                echo "DbServer[@]%dbhost%" >> wp.app
+                echo "DbName[@]%dbname%" >> wp.app
+                echo "DbUsername[@]%dbuser%" >> wp.app
+                echo "DbPassword[@]%dbpassword%" >> wp.app
+                echo "DbAdminUsername[@]%dbuser%" >> wp.app
+                echo "DbAdminPassword[@]%dbpassword%" >> wp.app
+                $tmpprofile = $env:userprofile
+                $env:userprofile = "c:\users\administrator"
+                $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
+                Start-Process $wpicmd -ArgumentList "/Install /Application:Wordpress@wp.app /MySQLPassword:%dbpassword% /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+                $env:userprofile = $tmpprofile
+              params:
+                "%dbhost%": { get_attr: [ db, hostname ] }
+                "%dbname%": { get_param: db_name }
+                "%dbuser%": { get_param: db_username }
+                "%dbpassword%": { get_param: db_password }
 
   lb:
     type: "Rackspace::Cloud::LoadBalancer"
@@ -170,10 +142,7 @@ resources:
           params:
             "%server_name%": { get_param: web_server_name }
       nodes:
-      - address: { get_attr: [ web_node_1, PublicIp ] }
-        port: 80
-        condition: ENABLED
-      - address: { get_attr: [ web_node_2, PublicIp ] }
+      - addresses: { get_attr: [ web_nodes, PrivateIp ] }
         port: 80
         condition: ENABLED
       protocol: HTTP
