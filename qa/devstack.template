@@ -1,0 +1,202 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a Devstack server
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: 2GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor large enough to run devstack
+
+  image:
+    type: String
+    description: Server image id to use
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    constraints:
+    - allowed_values:
+      - CentOS 6.4
+      - Red Hat Enterprise Linux 6.4
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Fedora 18 (Spherical Cow)
+      description: must be a Devstack-supported distro
+
+  server_name:
+    description: the instance name
+    type: String
+    default: Devstack server
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+
+  mysql_pass:
+    default: admin
+    hidden: true
+    description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  admin_pass:
+    default: admin
+    hidden: true
+    description: The database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  service_pass:
+    default: admin
+    hidden: true
+    description: The service password which is used by the OpenStack services to authenticate with Keystone.
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  rabbit_pass:
+    default: admin
+    hidden: true
+    description: The RabbitMQ service admin password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 41 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  enable_heat:
+    default: "false"
+    description: Enable the Heat service in Devstack
+    type: String
+    constraints:
+    - allowed_values: ["true", "false"]
+      description: must be either "true" or "false"
+
+  devstack_branch:
+    default: "master"
+    description: Devstack branch to clone
+    type: String
+
+resources:
+
+  devstack_server: 
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -x
+
+            # Install requirements
+            packages="git emacs nmap"
+            if [[ "%image%" == "Ubuntu 12.04 LTS (Precise Pangolin)" ]]; then
+                apt-get install -y $packages
+            else
+                yum -y install $packages
+            fi
+
+            # Configure and install Devstack
+            groupadd stack
+            useradd -g stack -s /bin/bash -d /opt/stack -m stack
+            echo "stack ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+            cat >~stack/install-devstack.sh<<EOF
+            #!/bin/bash -x
+
+            cd ~stack
+            git clone git://github.com/openstack-dev/devstack.git -b "%devstack_branch%"
+            cd devstack
+            if [[ "%enable_heat%" == "true" ]]; then
+                echo "enable_service heat h-api h-api-cfn h-api-cw h-eng" > localrc
+            fi
+            if [[ -n "%admin_pass%" ]]; then
+                echo "ADMIN_PASSWORD=%admin_pass%" >> localrc
+            fi
+            if [[ -n "%mysql_pass%" ]]; then
+                echo "MYSQL_PASSWORD=%mysql_pass%" >> localrc
+            fi
+            if [[ -n "%rabbit_pass%" ]]; then
+                echo "RABBIT_PASSWORD=%rabbit_pass%" >> localrc
+            fi
+            if [[ -n "%service_pass%" ]]; then
+                echo "SERVICE_PASSWORD=%service_pass%" >> localrc
+            fi
+            echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
+
+            sudo -u stack ~stack/devstack/stack.sh
+
+            # Add the SSH key to the stack user
+            mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
+            sudo tail -n1 /root/.ssh/authorized_keys > ~stack/.ssh/authorized_keys
+            chmod 400 ~stack/.ssh/authorized_keys
+
+            # Add the key to nova
+            nova --os-username admin --os-password "%admin_pass%" --os-tenant-name admin --os-auth-url http://localhost:5000/v2.0/ keypair-add "%key_name%" --pub-key ~stack/.ssh/authorized_keys
+
+            # Heat-specific configs below
+            [[ "%enable_heat%" != "true" ]] && exit 0
+
+            # Download convenience functions for Heat
+            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile
+            source ~stack/.bash_profile
+
+            # Download & install prebuilt Heat JEOS images
+            glance_create F17-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-i386-cfntools.qcow2
+            glance_create F17-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F17-x86_64-cfntools.qcow2
+            glance_create F18-i386-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-i386-cfntools.qcow2
+            glance_create F18-x86_64-cfntools http://fedorapeople.org/groups/heat/prebuilt-jeos-images/F18-x86_64-cfntools.qcow2
+            EOF
+            chmod +x ~stack/install-devstack.sh
+            sudo -u stack ~stack/install-devstack.sh
+          params:
+            "%mysql_pass%": { get_param: mysql_pass }
+            "%admin_pass%": { get_param: admin_pass }
+            "%rabbit_pass%": { get_param: rabbit_pass }
+            "%service_pass%": { get_param: service_pass }
+            "%enable_heat%": { get_param: enable_heat }
+            "%key_name%": { get_param: key_name }
+            "%image%": { get_param: image }
+            "%devstack_branch%": { get_param: devstack_branch }
+
+outputs:
+  
+  public_ip:
+    value: { get_attr: [ devstack_server, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ devstack_server, PrivateIp ] }
+    description: The private ip address of the server

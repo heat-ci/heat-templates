@@ -1,0 +1,64 @@
+heat_template_version: 2013-05-23
+
+description: |
+  A template implementation of a resource that provides a single MongoDB server instance
+
+parameters:
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: String 
+    default: 1GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 512MB Standard Instance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  server_name:
+    description: the instance name
+    type: String
+    default: MongoDB_One
+
+  key_name:
+    description: Nova keypair name for ssh access to the server
+    type: String
+    required: true
+
+resources:
+
+  mongo_server:
+    type: "Rackspace::Cloud::Server"
+    properties:
+      flavor: { get_param: flavor }
+      image: CentOS 6.4
+      name: { get_param: server_name }
+      key_name: { get_param: key_name }
+      user_data: |
+        cat <<EOF > /etc/yum.repos.d/mongodb.repo
+        [mongodb]
+        name=MongoDB Repository
+        baseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64/
+        gpgcheck=0
+        enabled=1
+        EOF
+        yum -y install mongo-10gen mongo-10gen-server
+        service mongod start
+        /sbin/iptables -I INPUT -p tcp --dport 27017 -j ACCEPT
+        service iptables save
+
+outputs:
+
+  public_ip:
+    value: { get_attr: [ mongo_server, PublicIp ] }
+    description: The public ip address of the server
+
+  private_ip:
+    value: { get_attr: [ mongo_server, PrivateIp ] }
+    description: The private ip address of the server
+

@@ -1,7 +1,7 @@
 heat_template_version: 2013-05-23
 
 description: |
-  A template implementation of a resource that provides a Ruby on Rails server
+  A template implementation of a resource that provides a PHP application server
 
 parameters:
 
@@ -23,67 +23,56 @@ parameters:
   server_name:
     description: the instance name
     type: String
-    default: Rails application
+    default: PHP application
 
   key_name:
     description: Nova keypair name for ssh access to the server
     type: String
     required: true
  
-  rails_path:
-    description: Path to root directory of Rails application
+  git_url:
+    description: URL of a Git repository containing the PHP code.
     type: String
-    default: /var/www/rails_app
-
-  http_port:
-    description: Port to start WEBrick on.
-    type: Number
-    default: 80
-    constraints:
-    - range:
-        min: 1
-        max: 65535
+    required: true
+    
 
 resources:
 
-  rails_server: 
+  php_app: 
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: Fedora 19 (Schrodinger's Cat)
+      image: CentOS 6.4
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
         str_replace:
           template: |
             #!/bin/bash -v
-            yum -y install ruby-devel rubygem-rails sqlite-devel git
-            iptables -I INPUT -p tcp --dport %http_port% -j ACCEPT
+            yum -y install httpd git php
+            /etc/init.d/httpd start
+            chkconfig httpd on
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
-            rails new %rails_path%
-            cd %rails_path%
-            bundle install
-            ./script/rails server -p %http_port% -d
+            git clone %git_url% /var/www/html/
           params:
-            "%rails_path%": { get_param: rails_path }
-            "%http_port%": { get_param: http_port }
+            "%git_url%": { get_param: git_url }
 
 outputs:
   
   public_ip:
-    value: { get_attr: [ rails_server, PublicIp ] }
+    value: { get_attr: [ php_app, PublicIp ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ rails_server, PrivateIp ] }
+    value: { get_attr: [ php_app, PrivateIp ] }
     description: The private ip address of the server
 
   website_url:
     value:
       str_replace:
-        template: http://%ip%:%port%/
+        template: http://%ip%/
         params:
-          "%ip%": { get_attr: [ rails_server, PublicIp ] }
-          "%port%": { get_param: http_port }
-    description: URL for Rails app
+          "%ip%": { get_attr: [ php_app, PublicIp ] }
+    description: URL for PHP app
 

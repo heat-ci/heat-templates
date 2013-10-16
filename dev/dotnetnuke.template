@@ -1,0 +1,83 @@
+heat_template_version: 2013-05-23
+
+description: |
+  HEAT template for installing DotNetNuke app on Windows Server
+
+parameters:
+
+  name:
+    type: String
+    default: HeatWinResource
+    description: Windows Server Name
+    constraints:
+    - length:
+        min: 1
+        max: 64
+    - allowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
+    
+  image:
+    type: String
+    default: Windows Server 2012
+    description: Windows Server Image
+  
+  flavor:
+    type: String
+    description: Rackspace Cloud Server flavor
+    default: 4GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor.
+  
+  
+  sql_password:
+    type: String
+    default: verybadpass_123
+    description: SQLExpress DB password
+
+
+resources:
+
+  rs_windows_server:
+    type: "Rackspace::Cloud::WinServer"
+    properties:
+      name: { get_param: name }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      user_data:
+        str_replace:
+          template: |
+            $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+            $destination = "webpi.msi"
+            $wc = New-Object System.Net.WebClient
+            $wc.DownloadFile($source, $destination)
+            Start-Process msiexec -ArgumentList "/i webpi.msi /qn"  -NoNewWindow -Wait
+            echo "AppPath[@]Default Web Site/dotnetnuke" > dnn.app
+            echo "sqldbpassword[@]${sqlpassword}" >> dnn.app
+            $tmpprofile = $env:userprofile
+            $env:userprofile = "c:\users\administrator"
+            $wpicmd = "C:\Program Files\Microsoft\Web Platform Installer\WebPICMD.exe"
+            Start-Process $wpicmd -ArgumentList "/Install /Application:dotnetnuke@dnn.app /SQLPassword:%sqlpassword% /AcceptEULA /Log:.\wpi.log"  -NoNewWindow -Wait
+            Start-Process 'dism' -ArgumentList "/online /enable-feature /featurename:IIS-ASPNET45 /all" -NoNewWindow -Wait
+            $env:userprofile = $tmpprofile
+          params:
+            "%sqlpassword%": { get_param: sql_password }
+
+
+outputs:
+
+  public_ip:
+    value: { get_attr: [ rs_windows_server, PublicIp ] }
+    description: public IP of the windows server
+  
+  website_url:
+    value:
+      str_replace:
+        template: http://%ip%/dotnetnuke/default.aspx
+        params:
+          "%ip%": { get_attr: [ rs_windows_server, PublicIp ] }
+    description: URL for Wordpress site

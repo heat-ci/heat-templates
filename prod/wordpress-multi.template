@@ -1,0 +1,191 @@
+heat_template_version: 2013-05-23
+
+description: |
+  HEAT template for deploying a multi-node wordpress deployment on Rackspace Cloud
+  using Cloud Servers, Cloud Load Balancers and Cloud Databases. This version uses
+  a user-defined template resource to specify the implementation of the web-heads
+
+parameters:
+
+  web_node_flavor:
+    description: flavor id for the web server instances
+    type: String
+    default: 1GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 512MB Standard Instance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: must be a valid Rackspace Cloud Server flavor.
+
+  web_server_name:
+    description: base name for the web server instances
+    type: String
+    default: Wordpress Webserver
+
+  key_name:
+    description: nova keypair to use for ssh access to the web nodes
+    type: String
+    required: true
+
+  db_name:
+    default: wordpress
+    description: the name for the wordpress database
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 64
+      description: must be between 1 and 64 characters
+    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
+
+  db_username:
+    default: admin
+    hidden: true
+    description: wordpress database admin account username
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 16
+      description: must be between 1 and 16 characters
+    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
+      description: must begin with a letter and contain only alphanumeric characters.
+
+  db_password:
+    default: admin
+    hidden: true
+    description: wordpress database admin account password
+    type: String
+    constraints:
+    - length:
+        min: 1
+        max: 41
+      description: must be between 1 and 14 characters
+    - allowed_pattern: "[a-zA-Z0-9]*"
+      description : must contain only alphanumeric characters.
+
+  db_flavor:
+    description: wordpress database instance size
+    type: String
+    default: 1GB Instance
+    constrants:
+    - allowed_values:
+      - 1GB Instance
+      - 2GB Instance
+      - 4GB Instance
+      - 8GB Instance
+      - 16GB Instance
+      description: must be a valid cloud database flavor 
+
+  db_volume_size: 
+    description : wordpress database volume size (in GB)
+    type: Number
+    default: 30
+    constraints:
+    - range:
+        min: 1
+        max: 1024
+      description: must be between 1 and 1024 GB
+
+  db_instance_name: 
+    description: the database instance name
+    type: String
+    default: WP_Cloud_DB
+
+resources:
+
+  web_nodes:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: Rackspace::Cloud::Server
+        properties:
+          flavor: { get_param: web_node_flavor }
+          image: CentOS 6.4
+          name: { get_param: web_server_name }
+          key_name: { get_param: key_name }
+          user_data:
+            str_replace:
+              template: |
+                #!/bin/bash -v
+                yum -y install mysql httpd wordpress
+                sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
+                sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
+                sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
+                /etc/init.d/httpd start
+                chkconfig httpd on
+                iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+                iptables-save > /etc/sysconfig/iptables
+              params:
+                "%dbhost%": { get_attr: [ db, hostname ] }
+                "%dbname%": { get_param: db_name }
+                "%dbuser%": { get_param: db_username }
+                "%dbpass%": { get_param: db_password }
+
+  lb:
+    type: "Rackspace::Cloud::LoadBalancer"
+    properties:
+      name:
+        str_replace:
+          template: "lb-%server_name%"
+          params:
+            "%server_name%": { get_param: web_server_name }
+      nodes:
+      - addresses: { get_attr: [ web_nodes, PrivateIp ] }
+        port: 80
+        condition: ENABLED
+      protocol: HTTP
+      halfClosed: False
+      algorithm: LEAST_CONNECTIONS
+      connectionThrottle:
+        maxConnections: 50
+        minConnections: 50
+        maxConnectionRate: 50
+        rateInterval: 50
+      port: 80
+      timeout: 120
+      sessionPersistence: HTTP_COOKIE
+      virtualIps:
+      - type: PUBLIC
+        ipVersion: IPV4
+      healthMonitor:
+        type: HTTP
+        delay: 10
+        timeout: 10
+        attemptsBeforeDeactivation: 3
+        path: "/"
+        statusRegex: "."
+        bodyRegex: "."
+      contentCaching: ENABLED
+
+  db:
+    type: Rackspace::Cloud::DBInstance
+    properties:
+      InstanceName: { get_param: db_instance_name }
+      FlavorRef: { get_param: db_flavor }
+      VolumeSize: { get_param: db_volume_size }
+      Users:
+      - Name: { get_param: db_username }
+        Password: { get_param: db_password }
+        Databases:
+        - { get_param: db_name }
+      Databases:
+      - Name: { get_param: db_name }
+
+outputs:
+
+  wordpress_url:
+    value: 
+      str_replace:
+        template: "http://%ip%/wordpress"
+        params:
+          "%ip%": { get_attr: [ lb, PublicIp ] }
+    description: Public URL for the wordpress blog
+

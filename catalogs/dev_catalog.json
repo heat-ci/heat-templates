@@ -1,0 +1,69 @@
+{
+  "templates": [
+    {
+      "id": 1,
+      "name": "Single Instance Redis Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/redis.template"
+    },
+    {
+      "id": 2,
+      "name": "Multi-node Wordpress (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-multi.template"
+    },
+    {
+      "id": 3,
+      "name": "PHP Application Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/php-app.template"
+    },
+    {
+      "id": 4,
+      "name": "Devstack (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/devstack.template"
+    },
+    {
+      "id": 5,
+      "name": "MySQL Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/mysql.template"
+    },
+    {
+      "id": 6,
+      "name": "Ruby on Rails Application Server (Linux)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/ruby-on-rails.template"
+    },
+    {
+      "id": 7,
+      "name": "Single-node Wordpress (Windows)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-single-winserver.template"
+    },
+    {
+      "id": 8,
+      "name": "Multi-node Wordpress (Windows + LB + Cloud DB)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-multinode-windows.template"
+    },
+    {
+      "id": 9,
+      "name": "Single-node Wordpress (Windows + Cloud DB)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-winserver-clouddb.template"
+    },
+    {
+      "id": 10,
+      "name": "DotNetNuke Application (Windows)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/dotnetnuke.template"
+    },
+    {
+      "id": 11,
+      "name": "All-in-one Rackspace Private Cloud",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/rcbops_allinone_inone.template"
+    },
+    {
+      "id": 12,
+      "name": "Single-instance MongoDB server",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/mongodb.template"
+    },
+    {
+      "id": 13,
+      "name": "Repose Server",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/repose.template"
+    }
+  ]
+}
