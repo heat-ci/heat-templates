@@ -1,0 +1,308 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Configures a cloud server with chef-solo
+
+parameters:
+
+  keypair_name:
+    type: String
+    required: true
+
+  stack_id:
+    type: String
+    required: true
+    default: "heat"
+
+  #DATABASE parameters
+  mysql_server_flavor:
+    type: String
+    required: true
+    default: "2"
+
+  mysql_server_name:
+    type: String
+    required: true
+    default: "mysql_server"
+
+  mysql_root_password:
+    type: String
+    required: true
+    default: "verybadpass123"
+
+  database_name:
+    type: String
+    default: "app_db"
+
+  database_username:
+    type: String
+    required: true
+    default: "wordpress"
+
+  database_password:
+    type: String
+    required: true
+    default: "verybadpass123"
+
+  #WORDPRESS parameters
+  wordpress_flavor:
+    type: String
+    required: true
+    default: "2"
+
+  wordpress_server_name:
+    type: String
+    required: true
+    default: wordpress_server
+
+  wordpress_database_username:
+    required: true
+    type: String
+    default: wp_dbuser
+
+  wordpress_database_password:
+    required: true
+    type: String
+    default: "verybadpass123"
+
+  wordpress_username:
+    type: String
+    required: true
+    default: wordpress_admin
+
+  wordpress_password:
+    type: String
+    required: true
+    default: "verybadpass123"
+
+  prefix:
+    type: String
+    default: wp
+
+  version:
+    type: String
+    default: 3.6.1
+    required: true
+
+  public_sync_key:
+    type: String
+    description: the key to be used by lsyncd clients
+    default: todo
+
+  private_sync_key:
+    type: String
+    description: the key to be used by the lsyncd server
+    default: todo
+
+  ssl_private_key:
+    type: String
+    default: todo
+
+  ssl_certificate:
+    type: String
+    default: todo
+
+  ssl_intermediate_key:
+    type: String
+    default: todo
+
+  wp_auth:
+    type: String
+    required: true
+    default: todo
+
+  wp_logged_in:
+    type: String
+    required: true
+    default: todo
+
+  wp_nonce:
+    type: String
+    required: true
+    default: todo
+
+  wp_secure_auth:
+    type: String
+    required: true
+    default: todo
+
+resources:
+    ssh_key:
+        Type: "OS::Nova::KeyPair"
+        properties:
+            name: {get_param: keypair_name}
+            save_private_key: true
+
+    mysql_server:
+        Type: "Rackspace::Cloud::Server"
+        properties:
+            flavor: {get_param: mysql_server_flavor}
+            image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+            name: { get_param: mysql_server_name }
+            key_name: {get_attr: [ssh_key, name]}
+
+    mysql_config: 
+        Type: "OS::Nova::ChefSolo"
+        properties:
+            public_key: {get_attr: [ssh_key, public_key]}
+            private_key: {get_attr: [ssh_key, private_key]}
+            hostname: {get_attr: [mysql_server, PublicIp]}
+            Berksfile: |
+                site :opscode
+                cookbook 'build-essential'
+                cookbook 'chef-client'
+                cookbook 'apt',
+                    :git => 'https://github.rackspace.com/Cookbooks/apt.git'
+                cookbook 'chef-solo-search'
+                cookbook 'firewall',
+                    :git => 'https://github.rackspace.com/Cookbooks/firewall.git'
+                cookbook 'mysql',
+                  :git => 'https://github.rackspace.com/andr5956/checkmate-solo-mysql.git'
+                cookbook 'holland',
+                  :git => 'https://github.rackspace.com/Cookbooks/holland.git'
+                cookbook 'monit',
+                  :git => 'https://github.rackspace.com/Cookbooks/monit.git'
+            
+            node_json:
+                deployment:
+                    id: {get_param: stack_id}
+                mysql:
+                    server_root_password: {get_param: mysql_root_password}
+                run_list: [
+                    "recipe[build-essential]",
+                    "recipe[apt]",
+                    "recipe[firewall]",
+                    "recipe[mysql::server]",
+                    "recipe[holland]",
+                    "recipe[holland::common]",
+                    "recipe[holland::mysqldump]"]
+
+            data_bags:
+                mysql: 
+                    name: {get_param: stack_id}
+                    encrypted: true
+                    data:
+                        id: {get_param: stack_id}
+                        mysql:
+                            host: {get_attr: [wordpress_server, PrivateIp]}
+                            database_name: {get_param: database_name}
+
+    wordpress_server:
+        Type: "Rackspace::Cloud::Server"
+        properties:
+            flavor: { get_param: wordpress_flavor }
+            image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+            name: { get_param: wordpress_server_name }
+            key_name: {get_attr: [ssh_key, name]}
+
+    wordpress_config: 
+        Type: "OS::Nova::ChefSolo"
+        DependsOn: "mysql_config"
+        properties:
+            public_key: {get_attr: [ssh_key, public_key]}
+            private_key: {get_attr: [ssh_key, private_key]}
+            hostname: {get_attr: [wordpress_server, PublicIp]}
+            Berksfile: |
+                cookbook 'chef-client'
+                cookbook 'memcached'
+                cookbook 'build-essential'
+                cookbook 'apt',
+                    :git => 'https://github.rackspace.com/Cookbooks/apt.git'
+                cookbook 'chef-solo-search'
+                cookbook 'firewall',
+                    :git => 'https://github.rackspace.com/Cookbooks/firewall.git'
+                cookbook 'apache2',
+                  :git => 'https://github.rackspace.com/Cookbooks/apache2.git',
+                  :ref => 'origin/checkmate-solo-apache2'
+                cookbook 'php5',
+                  :git => 'https://github.rackspace.com/Cookbooks/php5.git',
+                  :ref => 'origin/checkmate-solo'
+                cookbook 'lsyncd',
+                  :git => 'https://github.rackspace.com/Cookbooks/checkmate-solo-lsyncd.git'
+                cookbook 'varnish',
+                  :git => 'https://github.rackspace.com/Cookbooks/checkmate-solo-varnish.git'
+                cookbook 'monit',
+                  :git => 'https://github.rackspace.com/Cookbooks/monit.git'
+                cookbook 'vsftpd',
+                  :git => 'https://github.rackspace.com/Cookbooks/checkmate-solo-vsftpd.git'
+                cookbook 'wordpress',
+                  :git => 'https://github.rackspace.com/Cookbooks/checkmate-solo-wordpress.git'
+                cookbook 'suhosin',
+                  :git => 'https://github.rackspace.com/Cookbooks/suhosin.git' 
+
+            node_json:
+                deployment:
+                    id: {get_param: stack_id}
+                wordpress:
+                    version: {get_param: version}
+                run_list: ["recipe[build-essential]",
+                           "recipe[apt]",
+                           "recipe[firewall]",
+                           "recipe[wordpress]",
+                           "recipe[lsyncd::install]",
+                           "recipe[vsftpd]"]
+
+            data_bags:
+                wordpress:
+                    name: {get_param: stack_id}
+                    encrypted: true
+                    data:
+                        id: webapp_wordpress
+                        wordpress:
+                            database:
+                                create_db_user: true
+                                create_db: true
+                                host: {get_attr: [mysql_server, PrivateIp]}
+                                database_name: {get_param: database_name}
+                                server_root_password: {get_param: mysql_root_password}
+                                password: {get_param: database_password}
+                                username: {get_param: database_username}
+                                prefix: {get_param: prefix}
+                            user:
+                                name: {get_param: wordpress_username}
+                                password: {get_param: wordpress_password}
+                                #TODO: hash this
+                                hash: {get_param: wordpress_password}
+                            wp_auth: {get_param: wp_auth}
+                            wp_logged_in: {get_param: wp_logged_in}
+                            wp_nonce: {get_param: wp_nonce}
+                            wp_secure_auth: {get_param: wp_secure_auth}
+                            path: "/"
+                        lsyncd:
+                            user:
+                                ssh_pub_key: {get_attr: [ssh_key, public_key]}
+                                ssh_private_key: {get_attr: [ssh_key, private_key]}
+                                name: {get_param: wordpress_username}
+                                password: {get_param: wordpress_password}
+                            slaves: [{get_attr: [wordpress_server, PrivateIp]}]
+                        apache:
+                            domain_name: {get_attr: [wordpress_server, PublicIp]}
+                            path: "/"
+                        varnish:
+                            master_backend: {get_attr: [wordpress_server, PrivateIp]}
+
+outputs:
+    private_key:
+        value: { get_attr: [ssh_key, private_key] }
+    public_key:
+        value: { get_attr: [ssh_key, public_key] }
+    key_name:
+        value: {get_param: keypair_name}
+    mysql_root_password:
+        value: { get_param: mysql_root_password }
+    mysql_host:
+        value: { get_attr: [mysql_server, PublicIp] }
+    wordpress_url:
+        value: { get_attr: [wordpress_server, PublicIp]}
+    database_name:
+        value: {get_param: database_name}
+    database_password:
+        value: {get_param: database_password}
+    database_username:
+        value: {get_param: database_username}
+    wordpress_user:
+        value: {get_param: wordpress_username}
+    wordpress_pass:
+        value: {get_param: wordpress_password}
+
+
