@@ -64,6 +64,16 @@
       "id": 13,
       "name": "Repose Server",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/repose.template"
+    },
+    {
+      "id": 14,
+      "name": "IIS",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/iis.template"
+    },
+    {
+      "id": 15,
+      "name": "qlikview",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/qlikview.template"
     }
   ]
 }
