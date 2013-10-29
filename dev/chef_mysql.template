@@ -134,12 +134,13 @@ resources:
             save_private_key: true
 
     mysql_server:
+        DependsOn: "ssh_key"
         Type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
             image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
             name: { get_param: mysql_server_name }
-            key_name: {get_attr: [ssh_key, name]}
+            key_name: {get_param: keypair_name}
 
     mysql_config: 
         Type: "OS::Nova::ChefSolo"
@@ -189,11 +190,12 @@ resources:
 
     wordpress_server:
         Type: "Rackspace::Cloud::Server"
+        DependsOn: "ssh_key"
         properties:
             flavor: { get_param: wordpress_flavor }
             image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
             name: { get_param: wordpress_server_name }
-            key_name: {get_attr: [ssh_key, name]}
+            key_name: {get_param: keypair_name}
 
     wordpress_config: 
         Type: "OS::Nova::ChefSolo"
