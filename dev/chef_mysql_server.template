@@ -65,7 +65,7 @@ resources:
                     key_name: {get_param: key_name}
 
     mysql_config: 
-        Type: "OS::Nova::ChefSolo"
+        type: "OS::Nova::ChefSolo"
         properties:
             public_key: {get_param: public_key}
             private_key: {get_param: private_key}
