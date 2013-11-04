@@ -128,26 +128,25 @@ parameters:
 
 resources:
     ssh_key:
-        Type: "OS::Nova::KeyPair"
+        type: "OS::Nova::KeyPair"
         properties:
             name: {get_param: keypair_name}
             save_private_key: true
 
     mysql_server:
-        DependsOn: "ssh_key"
-        Type: "Rackspace::Cloud::Server"
+        type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
             image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
             name: { get_param: mysql_server_name }
-            key_name: {get_param: keypair_name}
+            key_name: {get_resource: ssh_key}
 
     mysql_config: 
         Type: "OS::Nova::ChefSolo"
         properties:
             public_key: {get_attr: [ssh_key, public_key]}
             private_key: {get_attr: [ssh_key, private_key]}
-            hostname: {get_attr: [mysql_server, PublicIp]}
+            hosts: [{get_attr: [mysql_server, PublicIp]}]
             Berksfile: |
                 site :opscode
                 cookbook 'build-essential'
@@ -171,6 +170,7 @@ resources:
                     server_root_password: {get_param: mysql_root_password}
                 run_list: [
                     "recipe[build-essential]",
+                    "recipe[chef-solo-search]",
                     "recipe[apt]",
                     "recipe[firewall]",
                     "recipe[mysql::server]",
@@ -185,25 +185,24 @@ resources:
                     data:
                         id: {get_param: stack_id}
                         mysql:
-                            host: {get_attr: [wordpress_server, PrivateIp]}
+                            host: {get_attr: [mysql_server, PrivateIp]}
                             database_name: {get_param: database_name}
 
     wordpress_server:
-        Type: "Rackspace::Cloud::Server"
-        DependsOn: "ssh_key"
+        type: "Rackspace::Cloud::Server"
         properties:
             flavor: { get_param: wordpress_flavor }
             image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
             name: { get_param: wordpress_server_name }
-            key_name: {get_param: keypair_name}
+            key_name: {get_resource: ssh_key}
 
     wordpress_config: 
-        Type: "OS::Nova::ChefSolo"
         DependsOn: "mysql_config"
+        type: "OS::Nova::ChefSolo"
         properties:
             public_key: {get_attr: [ssh_key, public_key]}
             private_key: {get_attr: [ssh_key, private_key]}
-            hostname: {get_attr: [wordpress_server, PublicIp]}
+            hosts: [{get_attr: [wordpress_server, PublicIp]}]
             Berksfile: |
                 cookbook 'chef-client'
                 cookbook 'memcached'
@@ -238,6 +237,7 @@ resources:
                 wordpress:
                     version: {get_param: version}
                 run_list: ["recipe[build-essential]",
+                           "recipe[chef-solo-search]",
                            "recipe[apt]",
                            "recipe[firewall]",
                            "recipe[wordpress]",
@@ -263,7 +263,6 @@ resources:
                             user:
                                 name: {get_param: wordpress_username}
                                 password: {get_param: wordpress_password}
-                                #TODO: hash this
                                 hash: {get_param: wordpress_password}
                             wp_auth: {get_param: wp_auth}
                             wp_logged_in: {get_param: wp_logged_in}
