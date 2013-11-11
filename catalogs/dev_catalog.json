@@ -92,7 +92,7 @@
     },
     {
       "id": 19,
-      "name": "Wordpsress (winserver + Cloud DB + DNS)",
+      "name": "Wordpress (winserver + Cloud DB + DNS)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-winserver-clouddb-dns.template"
     },
     {
