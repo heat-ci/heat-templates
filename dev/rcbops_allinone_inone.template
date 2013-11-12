@@ -83,11 +83,11 @@ parameters:
   system_cleanup_on_failure:
     description: Roll back server installation processes on Failure.
     type: String
-    default: false
+    default: False
     constraints:
     - allowed_values:
-      - true
-      - false
+      - True
+      - False
       description: If you are using the master branch you may want to enable no roll back as failures are likely on the unstable branch.
 
   cookbook_version:
@@ -131,7 +131,7 @@ resources:
             # Here are the script Override Values.
             
             # Setup no roll back on failure
-            export DISABLE_ROLL_BACK=%system_cleanup_on_failure%
+            export DISABLE_ROLL_BACK="$(echo %system_cleanup_on_failure% | tr '[:upper:]' '[:lower:]')"
 
             # Setup a master dev environment
             export COOKBOOK_VERSION="%cookbook_version%"
