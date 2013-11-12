@@ -80,7 +80,7 @@ parameters:
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password used for RabbitMQ.
 
-  roll_back_failure:
+  system_cleanup_on_failure:
     description: Roll back server installation processes on Failure.
     type: String
     default: false
@@ -111,6 +111,11 @@ parameters:
     type: String
     default: RackspacePrivateCloudDemo
     description: The Instance Name
+    
+  install_script_url:
+    type: String
+    default: https://raw.github.com/cloudnull/rcbops_allinone_inone/rax-stable/rcbops_allinone_inone.sh
+    description: Location of the script for installing the Openstack Environment
 
 resources:
 
@@ -126,7 +131,7 @@ resources:
             # Here are the script Override Values.
             
             # Setup no roll back on failure
-            export DISABLE_ROLL_BACK=%roll_back_failure%
+            export DISABLE_ROLL_BACK=%system_cleanup_on_failure%
 
             # Setup a master dev environment
             export COOKBOOK_VERSION="%cookbook_version%"
@@ -148,6 +153,7 @@ resources:
             # Add Some default Images
             export UBUNTU_IMAGE=True
             export FEDORA_IMAGE=True
+            export CIRROS_IMAGE=True
 
             # Begin the Install Process
             # ============================================================================
@@ -160,7 +166,7 @@ resources:
             fi
 
             # Get and run the installation script.
-            curl https://raw.github.com/cloudnull/rcbops_allinone_inone/master/rcbops_allinone_inone.sh | bash
+            curl "%script%" | bash
             
           params:
             "%cookbook_version%": { get_param: cookbook_version }
@@ -170,7 +176,8 @@ resources:
             "%system_pass%": { get_param: system_pass }
             "%run_list%": { get_param: run_list }
             "%image%": { get_param: image }
-            "%roll_back_failure%": { get_param: roll_back_failure }
+            "%system_cleanup_on_failure%": { get_param: system_cleanup_on_failure }
+            "%script%": { get_param: script }
 
 outputs:
 
