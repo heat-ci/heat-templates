@@ -80,15 +80,15 @@ parameters:
     - allowed_pattern: "[a-zA-Z0-9]*"
       description : Only Alpha-Numeric characters are allowed. This is the admin password used for RabbitMQ.
 
-  system_cleanup_on_failure:
+  cleanup_on_failure:
     description: Roll back server installation processes on Failure.
     type: String
-    default: no
+    default: Keep My Installation I will play with it later
     constraints:
     - allowed_values:
-      - yes
-      - no
-      description: If you are using the master branch you may want to enable no roll back as failures are likely on the unstable branch.
+      - Keep My Installation I will play with it later
+      - Nuke it from orbit its the only way to be sure
+      description: If you are using the master branch you may want to keep the installation as failures are likely on the unstable branch.
 
   cookbook_version:
     description: Cookbooks used for the Rackspace Private Cloud Deployment.
@@ -131,7 +131,7 @@ resources:
             # Here are the script Override Values.
             
             # Setup no roll back on failure
-            if [ "%system_cleanup_on_failure%" == "yes" ];then
+            if [ "%cleanup_on_failure%" == "Keep My Installation I will play with it later" ];then
               export DISABLE_ROLL_BACK=true
             else
               export DISABLE_ROLL_BACK=false
@@ -180,7 +180,7 @@ resources:
             "%system_pass%": { get_param: system_pass }
             "%run_list%": { get_param: run_list }
             "%image%": { get_param: image }
-            "%system_cleanup_on_failure%": { get_param: system_cleanup_on_failure }
+            "%cleanup_on_failure%": { get_param: cleanup_on_failure }
             "%script%": { get_param: script }
 
 outputs:
