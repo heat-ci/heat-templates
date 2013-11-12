@@ -146,10 +146,10 @@ resources:
 
             # Setup passwords
             
-            CHEF_PW="%chef_admin_pass%"
-            RMQ_PW="%rabbit_pass%"
-            NOVA_PW="%os_admin_pass%"
-            SYSTEM_PW="%system_pass%"
+            export CHEF_PW="%chef_admin_pass%"
+            export RMQ_PW="%rabbit_pass%"
+            export NOVA_PW="%os_admin_pass%"
+            export SYSTEM_PW="%system_pass%"
 
             # Set an override for my roles
             export RUN_LIST="%run_list%"
