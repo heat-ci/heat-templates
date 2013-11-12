@@ -114,7 +114,7 @@ parameters:
     
   install_script_url:
     type: String
-    default: https://raw.github.com/cloudnull/rcbops_allinone_inone/rax-stable/rcbops_allinone_inone.sh
+    default: "https://raw.github.com/cloudnull/rcbops_allinone_inone/rax-stable/rcbops_allinone_inone.sh"
     description: Location of the script for installing the Openstack Environment
 
 resources:
@@ -170,7 +170,7 @@ resources:
             fi
 
             # Get and run the installation script.
-            curl "%script%" | bash
+            curl "%install_script_url%" | bash
             
           params:
             "%cookbook_version%": { get_param: cookbook_version }
@@ -181,7 +181,7 @@ resources:
             "%run_list%": { get_param: run_list }
             "%image%": { get_param: image }
             "%cleanup_on_failure%": { get_param: cleanup_on_failure }
-            "%script%": { get_param: script }
+            "%install_script_url%": { get_param: install_script_url }
 
 outputs:
 
