@@ -32,78 +32,12 @@ parameters:
     type: String
     required: true
 
-  db_name:
-    default: wordpress
-    description: the name for the wordpress database
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 64
-      description: must be between 1 and 64 characters
-    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
-      description: must begin with a letter and contain only alphanumeric characters.
-
-  db_username:
-    default: admin
-    hidden: true
-    description: wordpress database admin account username
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 16
-      description: must be between 1 and 16 characters
-    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
-      description: must begin with a letter and contain only alphanumeric characters.
-
-  db_password:
-    default: admin
-    hidden: true
-    description: wordpress database admin account password
-    type: String
-    constraints:
-    - length:
-        min: 1
-        max: 41
-      description: must be between 1 and 14 characters
-    - allowed_pattern: "[a-zA-Z0-9]*"
-      description : must contain only alphanumeric characters.
-
-  db_flavor:
-    description: wordpress database instance size
-    type: String
-    default: 1GB Instance
-    constrants:
-    - allowed_values:
-      - 1GB Instance
-      - 2GB Instance
-      - 4GB Instance
-      - 8GB Instance
-      - 16GB Instance
-      description: must be a valid cloud database flavor 
-
-  db_volume_size: 
-    description : wordpress database volume size (in GB)
-    type: Number
-    default: 30
-    constraints:
-    - range:
-        min: 1
-        max: 1024
-      description: must be between 1 and 1024 GB
-
-  db_instance_name: 
-    description: the database instance name
-    type: String
-    default: WP_Cloud_DB
-
 resources:
 
   web_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 2
+      count: 3
       resource_def:
         type: Rackspace::Cloud::Server
         properties:
@@ -111,23 +45,13 @@ resources:
           image: CentOS 6.4
           name: { get_param: web_server_name }
           key_name: { get_param: key_name }
-          user_data:
-            str_replace:
-              template: |
-                #!/bin/bash -v
-                yum -y install mysql httpd wordpress
-                sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
-                sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
-                sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
-                /etc/init.d/httpd start
-                chkconfig httpd on
-                iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-                iptables-save > /etc/sysconfig/iptables
-              params:
-                "%dbhost%": { get_attr: [ db, hostname ] }
-                "%dbname%": { get_param: db_name }
-                "%dbuser%": { get_param: db_username }
-                "%dbpass%": { get_param: db_password }
+          user_data: >
+            #!/bin/bash -v
+            yum -y install httpd
+            /etc/init.d/httpd start
+            chkconfig httpd on
+            iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+            iptables-save > /etc/sysconfig/iptables
 
   lb:
     type: "Rackspace::Cloud::LoadBalancer"
@@ -143,7 +67,7 @@ resources:
         condition: ENABLED
       protocol: HTTP
       halfClosed: False
-      algorithm: LEAST_CONNECTIONS
+      algorithm: ROUND_ROBIN
       connectionThrottle:
         maxConnections: 50
         minConnections: 50
@@ -165,23 +89,9 @@ resources:
         bodyRegex: "."
       contentCaching: ENABLED
 
-  db:
-    type: Rackspace::Cloud::DBInstance
-    properties:
-      InstanceName: { get_param: db_instance_name }
-      FlavorRef: { get_param: db_flavor }
-      VolumeSize: { get_param: db_volume_size }
-      Users:
-      - Name: { get_param: db_username }
-        Password: { get_param: db_password }
-        Databases:
-        - { get_param: db_name }
-      Databases:
-      - Name: { get_param: db_name }
-
 outputs:
 
-  wordpress_url:
+  website_url:
     value: 
       str_replace:
         template: "http://%ip%/wordpress"
