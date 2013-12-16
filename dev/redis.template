@@ -38,7 +38,7 @@ resources:
   redis:
     type: Rackspace::Cloud::Server
     properties:
-      key_name: { get_param: key-name }
+      key_name: { get_param: key_name }
       image: { get_param: image }
       flavor: { get_param: flavor }
       user_data: |
