@@ -4,7 +4,7 @@ description: |
   Simple template to deploy Redis on a cloud server
 
 parameters:
-  key-name:
+  key_name:
     type: String
     description: Name of a nova ssh keypair to use for server access
   image:
