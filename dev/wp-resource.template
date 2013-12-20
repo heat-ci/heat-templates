@@ -93,6 +93,15 @@ resources:
             sed --in-place --e "s/localhost/%dbhost%/" --e "s/database_name_here/%dbname%/" --e "s/username_here/%dbuser%/" --e "s/password_here/%dbpass%/" /usr/share/wordpress/wp-config.php
             /etc/init.d/httpd start
             chkconfig httpd on
+            /etc/init.d/mysqld start
+            chkconfig mysqld on
+            cat << EOF | mysql
+            CREATE DATABASE %dbname%;
+            GRANT ALL PRIVILEGES ON %dbname%.* TO "%dbuser%"@"localhost"
+            IDENTIFIED BY "%dbpass%";
+            FLUSH PRIVILEGES;
+            EXIT
+            EOF
             iptables -I INPUT -p tcp --dport 80 -j ACCEPT
             iptables-save > /etc/sysconfig/iptables
           params:
