@@ -54,13 +54,11 @@ resources:
         properties:
             count: 2
             resource_def:
-                type: OS::Chef::Mysql::Server
+                type: https://raw.github.com/heat-ci/heat-templates/master/dev/chef_solo.template
                 properties:
                     stack_id: {get_param: stack_id}
                     #ssh key props
-                    public_key: {get_attr: [ssh_key, public_key]}
-                    private_key: {get_attr: [ssh_key, private_key]}
-                    key_name: {get_param: keypair_name}
+                    keypair_name: {get_param: keypair_name}
                     #database props
                     mysql_server_flavor: {get_param: mysql_server_flavor}
                     mysql_server_name: {get_param: mysql_server_name}
