@@ -42,26 +42,30 @@ parameters:
     required: true
     default: "verybadpass123"
 
-resources:
-    ssh_key:
-        type: "OS::Nova::KeyPair"
-        properties:
-            name: {get_param: keypair_name}
-            save_private_key: true
+  keypair_name:
+    type: String
+    required: true
+    default: "badkeypair"
 
+  private_key:
+   type: String
+   required: true
+   default: "badprivatekey"
+
+resources:
     mysql_server:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
             image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
             name: { get_param: mysql_server_name }
-            key_name: {Ref: ssh_key}
+            key_name: {get_param: keypair_name}
 
     install_apt:
         type: "OS::Heat::ChefSolo"
         properties:
             username: root
-            private_key: {get_attr: [ssh_key, private_key]}
+            private_key: {get_param: private_key}
             host: {get_attr: [mysql_server, PublicIp]}
             Berksfile: |
                 site :opscode
@@ -76,7 +80,7 @@ resources:
         DependsOn: install_apt
         properties:
             username: root
-            private_key: {get_attr: [ssh_key, private_key]}
+            private_key: {get_param: private_key}
             host: {get_attr: [mysql_server, PublicIp]}
             Berksfile: |
                 site :opscode
@@ -89,7 +93,7 @@ resources:
         DependsOn: install_make
         properties:
             username: root
-            private_key: {get_attr: [ssh_key, private_key]}
+            private_key: {get_param: private_key}
             host: {get_attr: [mysql_server, PublicIp]}
             Berksfile: |
                 site :opscode
@@ -136,4 +140,4 @@ resources:
 
 outputs:
     private_key:
-        value: {get_attr: [ssh_key, private_key]}
+        value: {get_param: private_key}

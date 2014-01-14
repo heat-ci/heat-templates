@@ -59,6 +59,7 @@ resources:
                     stack_id: {get_param: stack_id}
                     #ssh key props
                     keypair_name: {get_param: keypair_name}
+                    private_key: {get_attr: [ssh_key, private_key]}
                     #database props
                     mysql_server_flavor: {get_param: mysql_server_flavor}
                     mysql_server_name: {get_param: mysql_server_name}
