@@ -140,7 +140,7 @@ resources:
             key_name: {Ref: ssh_key}
 
     install_apt:
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
@@ -154,7 +154,7 @@ resources:
                 run_list: ["recipe[apt]"]
 
     install_make:
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         DependsOn: install_apt
         properties:
             username: root
@@ -167,7 +167,7 @@ resources:
                 run_list: ["recipe[build-essential]"]
 
     mysql_config: 
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         DependsOn: install_make
         properties:
             username: root
@@ -227,7 +227,7 @@ resources:
 
     install_wordpress_apt:
         DependsOn: "mysql_config"
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
@@ -241,7 +241,7 @@ resources:
                 run_list: ["recipe[apt]"]
 
     install_wordpress_make:
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         DependsOn: install_wordpress_apt
         properties:
             username: root
@@ -255,7 +255,7 @@ resources:
 
     wordpress_master: 
         DependsOn: "install_wordpress_make"
-        type: "OS::Nova::ChefSolo"
+        type: "OS::Heat::ChefSolo"
         properties:
             private_key: {get_attr: [ssh_key, private_key]}
             host: {get_attr: [wordpress_server, PublicIp]}
