@@ -61,7 +61,7 @@ resources:
             name: { get_param: mysql_server_name }
             key_name: {get_param: keypair_name}
 
-    install_apt:
+    update_apt:
         type: "OS::Heat::ChefSolo"
         properties:
             username: root
@@ -77,7 +77,7 @@ resources:
 
     install_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_apt
+        DependsOn: update_apt
         properties:
             username: root
             private_key: {get_param: private_key}

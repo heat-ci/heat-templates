@@ -139,7 +139,7 @@ resources:
             name: { get_param: mysql_server_name }
             key_name: {Ref: ssh_key}
 
-    install_apt:
+    update_apt:
         type: "OS::Heat::ChefSolo"
         properties:
             username: root
@@ -155,7 +155,7 @@ resources:
 
     install_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_apt
+        DependsOn: update_apt
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
