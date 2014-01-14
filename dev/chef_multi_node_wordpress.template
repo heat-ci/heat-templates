@@ -21,7 +21,7 @@ parameters:
   mysql_server_name:
     type: String
     required: true
-    default: "noop"
+    default: "mysql_server"
 
   mysql_root_password:
     type: String
@@ -30,12 +30,12 @@ parameters:
 
   database_name:
     type: String
-    default: "noop"
+    default: "wordpress_db"
 
   database_username:
     type: String
     required: true
-    default: "noop"
+    default: "wordpres_admin"
 
   database_password:
     type: String
@@ -51,12 +51,12 @@ parameters:
   wordpress_server_name:
     type: String
     required: true
-    default: wordpress_server
+    default: "wordpress_server"
 
   wordpress_database_username:
     required: true
     type: String
-    default: wp_dbuser
+    default: "wp_dbuser"
 
   wordpress_database_password:
     required: true
@@ -85,44 +85,44 @@ parameters:
   public_sync_key:
     type: String
     description: the key to be used by lsyncd clients
-    default: todo
+    default: "public_sync_key"
 
   private_sync_key:
     type: String
     description: the key to be used by the lsyncd server
-    default: todo
+    default: "private_sync_key"
 
   ssl_private_key:
     type: String
-    default: todo
+    default: "ssl_private_key"
 
   ssl_certificate:
     type: String
-    default: todo
+    default: "ssl_certificate"
 
   ssl_intermediate_key:
     type: String
-    default: todo
+    default: "ssl_intermediate_key"
 
   wp_auth:
     type: String
     required: true
-    default: todo
+    default: "wp_auth"
 
   wp_logged_in:
     type: String
     required: true
-    default: todo
+    default: "wp_logged_in"
 
   wp_nonce:
     type: String
     required: true
-    default: todo
+    default: "wp_nonce"
 
   wp_secure_auth:
     type: String
     required: true
-    default: todo
+    default: "wp_secure_auth"
 
 resources:
     ssh_key:
@@ -135,7 +135,7 @@ resources:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
-            image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
             name: { get_param: mysql_server_name }
             key_name: {Ref: ssh_key}
 
@@ -221,7 +221,7 @@ resources:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: { get_param: wordpress_flavor }
-            image: 23b564c9-c3e6-49f9-bc68-86c7a9ab5018
+            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
             name: { get_param: wordpress_server_name }
             key_name: {Ref: ssh_key}
 
