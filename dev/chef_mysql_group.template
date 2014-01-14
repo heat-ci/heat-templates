@@ -67,3 +67,8 @@ resources:
                     database_name: {get_param: database_name}
                     database_username: {get_param: database_username}
                     database_password: {get_param: database_password}
+outputs:
+    public_ips:
+        value: {get_attr: [mysql_servers, resource.PublicIp]}
+    private_ips:
+        value: {get_attr: [mysql_servers, resource.PrivateIp]}
