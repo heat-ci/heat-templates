@@ -69,6 +69,6 @@ resources:
                     database_password: {get_param: database_password}
 outputs:
     public_ips:
-        value: {get_attr: [mysql_servers, resource.PublicIp]}
+        value: {get_attr: [mysql_servers, PublicIp]}
     private_ips:
-        value: {get_attr: [mysql_servers, resource.PrivateIp]}
+        value: {get_attr: [mysql_servers, PrivateIp]}
