@@ -144,7 +144,7 @@ resources:
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [mysql_server, PublicIp]}
+            host: {get_attr: [mysql_server, accessIPv4]}
             Berksfile: |
                 site :opscode
                 cookbook 'apt',
@@ -159,7 +159,7 @@ resources:
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [mysql_server, PublicIp]}
+            host: {get_attr: [mysql_server, accessIPv4]}
             Berksfile: |
                 site :opscode
                 cookbook 'build-essential'
@@ -172,7 +172,7 @@ resources:
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [mysql_server, PublicIp]}
+            host: {get_attr: [mysql_server, accessIPv4]}
             Berksfile: |
                 site :opscode
                 cookbook 'build-essential'
@@ -214,7 +214,7 @@ resources:
                     encrypted: true
                     id: {get_param: stack_id}
                     mysql:
-                        host: {get_attr: [mysql_server, PrivateIp]}
+                        host: {get_attr: [mysql_server, privateIPv4]}
                         database_name: {get_param: database_name}
 
     wordpress_server:
@@ -231,7 +231,7 @@ resources:
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [wordpress_server, PublicIp]}
+            host: {get_attr: [wordpress_server, accessIPv4]}
             Berksfile: |
                 site :opscode
                 cookbook 'apt',
@@ -246,7 +246,7 @@ resources:
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [wordpress_server, PublicIp]}
+            host: {get_attr: [wordpress_server, accessIPv4]}
             Berksfile: |
                 site :opscode
                 cookbook 'build-essential'
@@ -258,7 +258,7 @@ resources:
         type: "OS::Heat::ChefSolo"
         properties:
             private_key: {get_attr: [ssh_key, private_key]}
-            host: {get_attr: [wordpress_server, PublicIp]}
+            host: {get_attr: [wordpress_server, accessIPv4]}
             Berksfile: "https://raw2.github.com/heat-ci/heat-templates/master/dev/chef_wordpress_berksfile"
 
             node:
@@ -283,7 +283,7 @@ resources:
                         database:
                             create_db_user: true
                             create_db: true
-                            host: {get_attr: [mysql_server, PrivateIp]}
+                            host: {get_attr: [mysql_server, privateIPv4]}
                             database_name: {get_param: database_name}
                             server_root_password: {get_param: mysql_root_password}
                             password: {get_param: database_password}
@@ -304,12 +304,12 @@ resources:
                             ssh_private_key: {get_attr: [ssh_key, private_key]}
                             name: {get_param: wordpress_username}
                             password: {get_param: wordpress_password}
-                        slaves: [{get_attr: [wordpress_server, PrivateIp]}]
+                        slaves: [{get_attr: [wordpress_server, privateIPv4]}]
                     apache:
-                        domain_name: {get_attr: [wordpress_server, PublicIp]}
+                        domain_name: {get_attr: [wordpress_server, accessIPv4]}
                         path: "/"
                     varnish:
-                        master_backend: {get_attr: [wordpress_server, PrivateIp]}
+                        master_backend: {get_attr: [wordpress_server, privateIPv4]}
 
 outputs:
     private_key:
@@ -321,9 +321,9 @@ outputs:
     mysql_root_password:
         value: { get_param: mysql_root_password }
     mysql_host:
-        value: { get_attr: [mysql_server, PublicIp] }
+        value: { get_attr: [mysql_server, accessIPv4] }
     wordpress_url:
-        value: { get_attr: [wordpress_server, PublicIp]}
+        value: { get_attr: [wordpress_server, accessIPv4]}
     database_name:
         value: {get_param: database_name}
     database_password:

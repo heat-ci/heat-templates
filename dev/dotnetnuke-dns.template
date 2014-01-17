@@ -98,7 +98,7 @@ resources:
       records:
       - name: { get_param: domain_name }
         type: { get_param: domain_record_type }
-        data: { get_attr: [rs_windows_server, PublicIp] }
+        data: { get_attr: [rs_windows_server, accessIPv4] }
       - name: { get_param: domain_name }
         type: NS
         data: dns1.stabletransit.com
@@ -109,7 +109,7 @@ resources:
 outputs:
 
   public_ip:
-    value: { get_attr: [ rs_windows_server, PublicIp ] }
+    value: { get_attr: [ rs_windows_server, accessIPv4 ] }
     description: public IP of the windows server
   
   website_url:
@@ -117,7 +117,7 @@ outputs:
       str_replace:
         template: http://%ip%/dotnetnuke/default.aspx
         params:
-          "%ip%": { get_attr: [ rs_windows_server, PublicIp ] }
+          "%ip%": { get_attr: [ rs_windows_server, accessIPv4 ] }
     description: URL for DNN site
 
   website_url:

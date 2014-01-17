@@ -71,11 +71,11 @@ resources:
 outputs:
   
   public_ip:
-    value: { get_attr: [ rails_server, PublicIp ] }
+    value: { get_attr: [ rails_server, accessIPv4 ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ rails_server, PrivateIp ] }
+    value: { get_attr: [ rails_server, privateIPv4 ] }
     description: The private ip address of the server
 
   website_url:
@@ -83,7 +83,7 @@ outputs:
       str_replace:
         template: http://%ip%:%port%/
         params:
-          "%ip%": { get_attr: [ rails_server, PublicIp ] }
+          "%ip%": { get_attr: [ rails_server, accessIPv4 ] }
           "%port%": { get_param: http_port }
     description: URL for Rails app
 
