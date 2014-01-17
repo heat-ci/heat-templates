@@ -61,11 +61,11 @@ resources:
 outputs:
   
   public_ip:
-    value: { get_attr: [ php_app, PublicIp ] }
+    value: { get_attr: [ php_app, accessIPv4 ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ php_app, PrivateIp ] }
+    value: { get_attr: [ php_app, privateIPv4 ] }
     description: The private ip address of the server
 
   website_url:
@@ -73,6 +73,6 @@ outputs:
       str_replace:
         template: http://%ip%/
         params:
-          "%ip%": { get_attr: [ php_app, PublicIp ] }
+          "%ip%": { get_attr: [ php_app, accessIPv4 ] }
     description: URL for PHP app
 

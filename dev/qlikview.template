@@ -93,7 +93,7 @@ resources:
 outputs:
 
   public_ip:
-    value: { get_attr: [ rs_windows_server, PublicIp ] }
+    value: { get_attr: [ rs_windows_server, accessIPv4 ] }
     description: public IP of the windows server
   
 
