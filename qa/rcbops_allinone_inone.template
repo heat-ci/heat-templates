@@ -186,5 +186,5 @@ resources:
 outputs:
 
   public_ip:
-    value: { get_attr: [ private_cloud_server, PublicIp ] }
+    value: { get_attr: [ private_cloud_server, accessIPv4 ] }
     description: The public IP address of the newly configured Server.
