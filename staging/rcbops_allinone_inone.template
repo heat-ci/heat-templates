@@ -26,6 +26,13 @@ parameters:
       - 8GB Standard Instance
       - 15GB Standard Instance
       - 30GB Standard Instance
+      - 4 GB Performance
+      - 8 GB Performance
+      - 15 GB Performance
+      - 30 GB Performance
+      - 60 GB Performance
+      - 90 GB Performance
+      - 120 GB Performance
       description: Must be a valid Rackspace Cloud Server flavor large enough to run Chef and Openstack, Default is 4GB.
 
   os_admin_pass:
@@ -93,9 +100,11 @@ parameters:
   cookbook_version:
     description: Cookbooks used for the Rackspace Private Cloud Deployment.
     type: String
-    default: v4.1.2
+    default: v4.2.1
     constraints:
     - allowed_values:
+      - v4.2.1
+      - v4.2.0
       - v4.1.2
       - v4.1.1
       - v4.1.0
@@ -104,7 +113,7 @@ parameters:
 
   run_list:
     type: String
-    default: role[allinone],role[cinder-all]
+    default: role[allinone],role[cinder-all],role[heat-all]
     description: Server Setup Run List
       
   server_name:
@@ -141,7 +150,7 @@ resources:
             export COOKBOOK_VERSION="%cookbook_version%"
 
             # Setup cidrs
-            export NOVA_INTERFACE="lo"
+            export NOVA_INTERFACE="eth0"
             export MANAGEMENT_INTERFACE="eth0"
 
             # Setup passwords
