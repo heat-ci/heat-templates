@@ -64,6 +64,41 @@
       "id": 13,
       "name": "Repose Server",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/repose.template"
+    },
+    {
+      "id": 14,
+      "name": "IIS",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/iis.template"
+    },
+    {
+      "id": 15,
+      "name": "qlikview",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/qlikview.template"
+    },
+    {
+      "id": 16,
+      "name": "Multi-node Wordpress (Linux + LB + Cloud DB + DNS)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-multi-dns.template"
+    },
+    {
+      "id": 17,
+      "name": "Multi-node Wordpress (windows + LB + Cloud DB + DNS)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-multi-windows-dns.template"
+    },
+    {
+      "id": 18,
+      "name": "Wordpress (Linux + Cloud DB + DNS)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wp-single-linux-cdb-dns.template"
+    },
+    {
+      "id": 19,
+      "name": "Wordpress (winserver + Cloud DB + DNS)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/wordpress-winserver-clouddb-dns.template"
+    },
+    {
+      "id": 20,
+      "name": "DotNetNuke (with DNS)",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/dotnetnuke-dns.template"
     }
   ]
 }

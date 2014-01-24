@@ -39,6 +39,29 @@ parameters:
     default: verybadpass_123
     description: SQLExpress DB password
 
+  domain_name:    
+    description: valid domain name
+    type: String
+    default: example.com
+    
+  email_address:
+    description: domain owner email addresses
+    type: String
+    default: admin@example.com
+  
+  domain_record_type:
+    description: domain record type
+    type: String
+    default: A
+    constrants:
+    - allowed_values:
+      - A
+      - AAAA
+      - NS
+      - MX
+      - CNAME
+      - TXT
+      - SRV
 
 resources:
 
@@ -67,6 +90,21 @@ resources:
           params:
             "%sqlpassword%": { get_param: sql_password }
 
+  dns:
+    type: Rackspace::Cloud::DNS
+    properties:
+      name: { get_param: domain_name }
+      emailAddress: { get_param: email_address }
+      records:
+      - name: { get_param: domain_name }
+        type: { get_param: domain_record_type }
+        data: { get_attr: [rs_windows_server, accessIPv4] }
+      - name: { get_param: domain_name }
+        type: NS
+        data: dns1.stabletransit.com
+      - name: { get_param: domain_name }
+        type: NS
+        data: dns2.stabletransit.com
 
 outputs:
 
@@ -80,4 +118,12 @@ outputs:
         template: http://%ip%/dotnetnuke/default.aspx
         params:
           "%ip%": { get_attr: [ rs_windows_server, accessIPv4 ] }
-    description: URL for Wordpress site
+    description: URL for DNN site
+
+  website_url:
+    value:
+      str_replace:
+        template: http://%domain%/dotnetnuke/default.aspx
+        params:
+          "%domain%": { get_attr: [ get_param, domain_name ] }
+    description: URL for DNN site with domain name

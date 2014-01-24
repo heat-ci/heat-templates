@@ -94,6 +94,30 @@ parameters:
     type: String
     default: WP_Cloud_DB
 
+  domain_name:    
+    description: valid domain name
+    type: String
+    default: example.com
+    
+  email_address:
+    description: domain owner email addresses
+    type: String
+    default: admin@example.com
+  
+  domain_record_type:
+    description: domain record type
+    type: String
+    default: A
+    constrants:
+    - allowed_values:
+      - A
+      - AAAA
+      - NS
+      - MX
+      - CNAME
+      - TXT
+      - SRV
+
 resources:
 
   web_node: 
@@ -129,18 +153,34 @@ resources:
             "%dbpassword%": { get_param: db_password }
 
   db:
-    type: "Rackspace::Cloud::DBInstance"
+    type: OS::Trove::Instance
     properties:
-      InstanceName: { get_param: db_instance_name }
-      FlavorRef: { get_param: db_flavor }
-      VolumeSize: { get_param: db_volume_size }
-      Users:
-      - Name: { get_param: db_username }
-        Password: { get_param: db_password }
-        Databases:
+      name: { get_param: db_instance_name }
+      flavor: { get_param: db_flavor }
+      size: { get_param: db_volume_size }
+      users:
+      - name: { get_param: db_username }
+        password: { get_param: db_password }
+        databases:
         - { get_param: db_name }
-      Databases:
-      - Name: { get_param: db_name }
+      databases:
+      - name: { get_param: db_name }
+
+  dns:
+    type: Rackspace::Cloud::DNS
+    properties:
+      name: { get_param: domain_name }
+      emailAddress: { get_param: email_address }
+      records:
+      - name: { get_param: domain_name }
+        type: { get_param: domain_record_type }
+        data: { get_attr: [web_node, accessIPv4] }
+      - name: { get_param: domain_name }
+        type: NS
+        data: dns1.stabletransit.com
+      - name: { get_param: domain_name }
+        type: NS
+        data: dns2.stabletransit.com
 
 outputs:
 
@@ -151,3 +191,11 @@ outputs:
         params:
           "%ip%": { get_attr: [ web_node, accessIPv4 ] }
     description: Public URL for the wordpress blog
+
+  wordpress_domain_url:
+    value: 
+      str_replace:
+        template: "http://%domain%/wordpress"
+        params:
+          "%domain%": { get_param: domain_name }
+    description: Public URL for the wordpress blog with domain name

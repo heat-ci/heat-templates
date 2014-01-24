@@ -4,7 +4,7 @@ description: |
   Simple template to deploy Redis on a cloud server
 
 parameters:
-  key-name:
+  key_name:
     type: String
     description: Name of a nova ssh keypair to use for server access
   image:
@@ -38,7 +38,7 @@ resources:
   redis:
     type: Rackspace::Cloud::Server
     properties:
-      key_name: { get_param: key-name }
+      key_name: { get_param: key_name }
       image: { get_param: image }
       flavor: { get_param: flavor }
       user_data: |
@@ -63,7 +63,7 @@ outputs:
           "%host%":
             get_attr:
             - redis
-            - PublicIp
+            - accessIPv4
     description: ssh to the redis host
   verify:
     value:
@@ -73,5 +73,5 @@ outputs:
           "%host%":
             get_attr:
             - redis
-            - PublicIp
+            - accessIPv4
     description: verify the redis server via redis-cli

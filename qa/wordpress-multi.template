@@ -138,7 +138,7 @@ resources:
           params:
             "%server_name%": { get_param: web_server_name }
       nodes:
-      - addresses: { get_attr: [ web_nodes, PrivateIp ] }
+      - addresses: { get_attr: [ web_nodes, privateIPv4 ] }
         port: 80
         condition: ENABLED
       protocol: HTTP
@@ -186,6 +186,6 @@ outputs:
       str_replace:
         template: "http://%ip%/wordpress"
         params:
-          "%ip%": { get_attr: [ lb, PublicIp ] }
+          "%ip%": { get_attr: [ lb, accessIPv4 ] }
     description: Public URL for the wordpress blog
 
