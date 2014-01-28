@@ -187,6 +187,6 @@ outputs:
       str_replace:
         template: "http://%ip%/wordpress"
         params:
-          "%ip%": { get_attr: [ lb, accessIPv4 ] }
+          "%ip%": { get_attr: [ lb, PublicIp ] }
     description: Public URL for the wordpress blog
 
