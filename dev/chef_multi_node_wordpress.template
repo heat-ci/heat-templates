@@ -5,122 +5,122 @@ description: |
 
 parameters:
   keypair_name:
-    type: String
+    type: string
     required: true
 
   stack_id:
-    type: String
+    type: string
     required: true
     default: "webapp_wordpress"
 
   mysql_server_flavor:
-    type: String
+    type: string
     required: true
     default: "performance1-1"
 
   mysql_server_name:
-    type: String
+    type: string
     required: true
     default: "mysql_server"
 
   mysql_root_password:
-    type: String
+    type: string
     required: true
     default: "verybadpass123"
 
   database_name:
-    type: String
+    type: string
     default: "wordpress_db"
 
   database_username:
-    type: String
+    type: string
     required: true
     default: "wordpres_admin"
 
   database_password:
-    type: String
+    type: string
     required: true
     default: "verybadpass123"
 
   #WORDPRESS parameters
   wordpress_flavor:
-    type: String
+    type: string
     required: true
     default: "performance1-1"
 
   wordpress_server_name:
-    type: String
+    type: string
     required: true
     default: "wordpress_server"
 
   wordpress_database_username:
     required: true
-    type: String
+    type: string
     default: "wp_dbuser"
 
   wordpress_database_password:
     required: true
-    type: String
+    type: string
     default: "verybadpass123"
 
   wordpress_username:
-    type: String
+    type: string
     required: true
     default: wordpress_admin
 
   wordpress_password:
-    type: String
+    type: string
     required: true
     default: "verybadpass123"
 
   prefix:
-    type: String
+    type: string
     default: wp
 
   version:
-    type: String
+    type: string
     default: 3.6.1
     required: true
 
   public_sync_key:
-    type: String
+    type: string
     description: the key to be used by lsyncd clients
     default: "public_sync_key"
 
   private_sync_key:
-    type: String
+    type: string
     description: the key to be used by the lsyncd server
     default: "private_sync_key"
 
   ssl_private_key:
-    type: String
+    type: string
     default: "ssl_private_key"
 
   ssl_certificate:
-    type: String
+    type: string
     default: "ssl_certificate"
 
   ssl_intermediate_key:
-    type: String
+    type: string
     default: "ssl_intermediate_key"
 
   wp_auth:
-    type: String
+    type: string
     required: true
     default: "wp_auth"
 
   wp_logged_in:
-    type: String
+    type: string
     required: true
     default: "wp_logged_in"
 
   wp_nonce:
-    type: String
+    type: string
     required: true
     default: "wp_nonce"
 
   wp_secure_auth:
-    type: String
+    type: string
     required: true
     default: "wp_secure_auth"
 

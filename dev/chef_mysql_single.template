@@ -5,50 +5,50 @@ description: |
 
 parameters:
   keypair_name:
-    type: String
+    type: string
     required: true
 
   stack_id:
-    type: String
+    type: string
     required: true
     default: "mysql_stack"
 
   mysql_server_flavor:
-    type: String
+    type: string
     required: true
     default: "performance1-1"
 
   mysql_server_name:
-    type: String
+    type: string
     required: true
     default: "mysql_server"
 
   mysql_root_password:
-    type: String
+    type: string
     required: true
     default: "verybadpass123"
 
   database_name:
-    type: String
+    type: string
     default: "mysql_database"
 
   database_username:
-    type: String
+    type: string
     required: true
     default: "mysql_user"
 
   database_password:
-    type: String
+    type: string
     required: true
     default: "verybadpass123"
 
   keypair_name:
-    type: String
+    type: string
     required: true
     default: "badkeypair"
 
   private_key:
-   type: String
+   type: string
    required: true
    default: "badprivatekey"
 

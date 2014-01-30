@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: String 
+    type: string 
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -22,22 +22,22 @@ parameters:
 
   server_name:
     description: the instance name
-    type: String
+    type: string
     default: Rails application
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: String
+    type: string
     required: true
  
   rails_path:
     description: Path to root directory of Rails application
-    type: String
+    type: string
     default: /var/www/rails_app
 
   http_port:
     description: Port to start WEBrick on.
-    type: Number
+    type: number
     default: 80
     constraints:
     - range:

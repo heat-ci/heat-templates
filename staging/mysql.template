@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: String 
+    type: string 
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -22,12 +22,12 @@ parameters:
 
   server_name:
     description: the instance name
-    type: String
+    type: string
     default: MySQL server
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: String
+    type: string
     required: true
 
 resources:

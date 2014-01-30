@@ -6,7 +6,7 @@ description: |
 parameters:
 
   name:
-    type: String
+    type: string
     default: HeatWinResource
     description: Windows Server Name
     constraints:
@@ -17,12 +17,12 @@ parameters:
       description: must begin with a letter and contain only alphanumeric characters.
     
   image:
-    type: String
+    type: string
     default: Windows Server 2012
     description: Windows Server Image
   
   flavor:
-    type: String
+    type: string
     description: Rackspace Cloud Server flavor
     default: 4GB Standard Instance
     constraints:
@@ -35,23 +35,23 @@ parameters:
   
   
   sql_password:
-    type: String
+    type: string
     default: verybadpass_123
     description: SQLExpress DB password
 
   domain_name:    
     description: valid domain name
-    type: String
+    type: string
     default: example.com
     
   email_address:
     description: domain owner email addresses
-    type: String
+    type: string
     default: admin@example.com
   
   domain_record_type:
     description: domain record type
-    type: String
+    type: string
     default: A
     constrants:
     - allowed_values:

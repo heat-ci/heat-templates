@@ -9,7 +9,7 @@ parameters:
 
   web_node_flavor:
     description: flavor id for the web server instances
-    type: String
+    type: string
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -24,18 +24,18 @@ parameters:
 
   web_server_name:
     description: base name for the web server instances
-    type: String
+    type: string
     default: Wordpress Webserver
 
   key_name:
     description: nova keypair to use for ssh access to the web nodes
-    type: String
+    type: string
     required: true
 
   db_name:
     default: wordpress
     description: the name for the wordpress database
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -48,7 +48,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account username
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -61,7 +61,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -72,7 +72,7 @@ parameters:
 
   db_flavor:
     description: wordpress database instance size
-    type: String
+    type: string
     default: 1GB Instance
     constrants:
     - allowed_values:
@@ -85,7 +85,7 @@ parameters:
 
   db_volume_size: 
     description : wordpress database volume size (in GB)
-    type: Number
+    type: number
     default: 30
     constraints:
     - range:
@@ -95,22 +95,22 @@ parameters:
 
   db_instance_name: 
     description: the database instance name
-    type: String
+    type: string
     default: WP_Cloud_DB
   
   domain_name:    
     description: valid domain name
-    type: String
+    type: string
     default: example.com
     
   email_address:
     description: domain owner email addresses
-    type: String
+    type: string
     default: admin@example.com
   
   domain_record_type:
     description: domain record type
-    type: String
+    type: string
     default: A
     constrants:
     - allowed_values:

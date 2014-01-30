@@ -6,7 +6,7 @@ description: |
 parameters:
 
   server_hostname:
-    type: String
+    type: string
     default: HeatWinResource
     description: Windows Server Name
     constraints:
@@ -17,12 +17,12 @@ parameters:
       description: must begin with a letter and contain only alphanumeric characters.
     
   image:
-    type: String
+    type: string
     default: Windows Server 2012
     description: Windows Server Image
   
   flavor:
-    type: String
+    type: string
     description: Rackspace Cloud Server flavor
     default: 4GB Standard Instance
     constraints:
