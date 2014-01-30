@@ -8,7 +8,7 @@ parameters:
 
   web_node_flavor:
     description: flavor id for the web server instances
-    type: string
+    type: String
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -23,18 +23,18 @@ parameters:
 
   web_server_name:
     description: base name for the web server instances
-    type: string
+    type: String
     default: Wordpress Webserver
 
   key_name:
     description: nova keypair to use for ssh access to the web nodes
-    type: string
+    type: String
     required: true
 
   db_name:
     default: wordpress
     description: the name for the wordpress database
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -47,7 +47,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account username
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -60,7 +60,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account password
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -71,7 +71,7 @@ parameters:
 
   db_flavor:
     description: wordpress database instance size
-    type: string
+    type: String
     default: 1GB Instance
     constrants:
     - allowed_values:
@@ -84,7 +84,7 @@ parameters:
 
   db_volume_size:
     description : wordpress database volume size (in GB)
-    type: number
+    type: Number
     default: 30
     constraints:
     - range:
@@ -94,7 +94,7 @@ parameters:
 
   db_instance_name:
     description: the database instance name
-    type: string
+    type: String
     default: WP_Cloud_DB
 
 resources:

@@ -6,7 +6,7 @@ description: |
 parameters:
 
   server_hostname:
-    type: string
+    type: String
     default: HeatWinResource
     description: Windows Server Name
     constraints:
@@ -17,12 +17,12 @@ parameters:
       description: must begin with a letter and contain only alphanumeric characters.
     
   image:
-    type: string
+    type: String
     default: Windows Server 2012
     description: Windows Server Image
   
   flavor:
-    type: string
+    type: String
     description: Rackspace Cloud Server flavor
     default: 4GB Standard Instance
     constraints:
@@ -34,7 +34,7 @@ parameters:
       description: must be a valid Rackspace Cloud Server flavor.
   
   db_name:
-    type: string
+    type: String
     default: wordpress
     description: The WordPress database name
     constraints:
@@ -45,12 +45,12 @@ parameters:
       description: must begin with a letter and contain only alphanumeric characters.
   
   db_password:
-    type: string
+    type: String
     default: verybadpass_123
     description: Database password
     
   db_admin_password:
-    type: string
+    type: String
     default: verybadpass_123
     description: Database Admin password
 

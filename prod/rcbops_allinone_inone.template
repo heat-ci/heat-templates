@@ -7,7 +7,7 @@ parameters:
 
   image:
     description: Rackspace Cloud Server Image (Distribution)
-    type: string
+    type: String
     default: Ubuntu 12.04 LTS (Precise Pangolin)
     constraints:
     - allowed_values:
@@ -18,7 +18,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor (Size)
-    type: string
+    type: String
     default: 4GB Standard Instance
     constraints:
     - allowed_values:
@@ -32,7 +32,7 @@ parameters:
     default: secrete
     hidden: true
     description: Password for the Openstack Admin User
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -45,7 +45,7 @@ parameters:
     default: secrete
     hidden: true
     description: Password for the System User
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -58,7 +58,7 @@ parameters:
     default: secrete
     hidden: true
     description: Password for the Chef Admin User
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -71,7 +71,7 @@ parameters:
     default: secrete
     hidden: true
     description: Password for RabbitMQ
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -82,7 +82,7 @@ parameters:
 
   cleanup_on_failure:
     description: Roll back server installation processes on Failure.
-    type: string
+    type: String
     default: Keep My Installation I will play with it later
     constraints:
     - allowed_values:
@@ -92,7 +92,7 @@ parameters:
 
   cookbook_version:
     description: Cookbooks used for the Rackspace Private Cloud Deployment.
-    type: string
+    type: String
     default: v4.1.2
     constraints:
     - allowed_values:
@@ -103,17 +103,17 @@ parameters:
       description: Version of the Rackspace Private Cloud you wish to deploy. Notice! Master may NOT be Stable.
 
   run_list:
-    type: string
+    type: String
     default: role[allinone],role[cinder-all]
     description: Server Setup Run List
       
   server_name:
-    type: string
+    type: String
     default: RackspacePrivateCloudDemo
     description: The Instance Name
     
   install_script_url:
-    type: string
+    type: String
     default: "https://raw.github.com/cloudnull/rcbops_allinone_inone/rax-stable/rcbops_allinone_inone.sh"
     description: Location of the script for installing the Openstack Environment
 

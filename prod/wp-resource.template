@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: string 
+    type: String 
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -22,23 +22,23 @@ parameters:
 
   server_name:
     description: the instance name
-    type: string
+    type: String
     default: Wordpress Webserver
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: string
+    type: String
     required: true
  
   db_host:
     description: The database hostname
-    type: string
+    type: String
     default: localhost
 
   db_name:
     default: wordpress
     description: The WordPress database name
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -51,7 +51,7 @@ parameters:
     default: admin
     hidden: true
     description: The WordPress database admin account username
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
@@ -64,7 +64,7 @@ parameters:
     default: admin
     hidden: true
     description: The WordPress database admin account password
-    type: string
+    type: String
     constraints:
     - length:
         min: 1
