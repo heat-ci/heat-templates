@@ -63,7 +63,7 @@ outputs:
           "%host%":
             get_attr:
             - redis
-            - PublicIp
+            - accessIPv4
     description: ssh to the redis host
   verify:
     value:
@@ -73,5 +73,5 @@ outputs:
           "%host%":
             get_attr:
             - redis
-            - PublicIp
+            - accessIPv4
     description: verify the redis server via redis-cli

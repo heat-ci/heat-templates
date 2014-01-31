@@ -142,7 +142,7 @@ resources:
           params:
             "%server_name%": { get_param: web_server_name }
       nodes:
-      - addresses: { get_attr: [ web_nodes, PrivateIp ] }
+      - addresses: { get_attr: [ web_nodes, privateIPv4 ] }
         port: 80
         condition: ENABLED
       protocol: HTTP
@@ -170,18 +170,18 @@ resources:
       contentCaching: ENABLED
 
   db:
-    type: "Rackspace::Cloud::DBInstance"
+    type: OS::Trove::Instance
     properties:
-      InstanceName: { get_param: db_instance_name }
-      FlavorRef: { get_param: db_flavor }
-      VolumeSize: { get_param: db_volume_size }
-      Users:
-      - Name: { get_param: db_username }
-        Password: { get_param: db_password }
-        Databases:
+      name: { get_param: db_instance_name }
+      flavor: { get_param: db_flavor }
+      size: { get_param: db_volume_size }
+      users:
+      - name: { get_param: db_username }
+        password: { get_param: db_password }
+        databases:
         - { get_param: db_name }
-      Databases:
-      - Name: { get_param: db_name }
+      databases:
+      - name: { get_param: db_name }
 
 outputs:
 

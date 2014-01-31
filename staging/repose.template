@@ -70,9 +70,9 @@ resources:
 outputs:
   
   public_ip:
-    value: { get_attr: [ repose_server, PublicIp ] }
+    value: { get_attr: [ repose_server, accessIPv4 ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ repose_server, PrivateIp ] }
+    value: { get_attr: [ repose_server, privateIPv4 ] }
     description: The private ip address of the server
