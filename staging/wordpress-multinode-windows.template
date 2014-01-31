@@ -9,7 +9,7 @@ parameters:
 
   web_node_flavor:
     description: flavor for the web server instances
-    Type: String
+    type: string
     default: 4GB Standard Instance
     constraints:
     - allowed_values:
