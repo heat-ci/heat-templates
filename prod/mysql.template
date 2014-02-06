@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: String 
+    type: string 
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -22,12 +22,12 @@ parameters:
 
   server_name:
     description: the instance name
-    type: String
+    type: string
     default: MySQL server
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: String
+    type: string
     required: true
 
 resources:
@@ -47,9 +47,9 @@ resources:
 outputs:
 
   public_ip:
-    value: { get_attr: [ mysql_server, PublicIp ] }
+    value: { get_attr: [ mysql_server, accessIPv4 ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ mysql_server, PrivateIp ] }
+    value: { get_attr: [ mysql_server, privateIPv4 ] }
     description: The private ip address of the server

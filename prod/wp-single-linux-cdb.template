@@ -8,7 +8,7 @@ parameters:
 
   web_node_flavor:
     description: flavor id for the web server instances
-    type: String
+    type: string
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -23,18 +23,18 @@ parameters:
 
   web_server_name:
     description: base name for the web server instances
-    type: String
+    type: string
     default: Wordpress Webserver
 
   key_name:
     description: nova keypair to use for ssh access to the web nodes
-    type: String
+    type: string
     required: true
 
   db_name:
     default: wordpress
     description: the name for the wordpress database
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -47,7 +47,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account username
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -60,7 +60,7 @@ parameters:
     default: admin
     hidden: true
     description: wordpress database admin account password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -71,7 +71,7 @@ parameters:
 
   db_flavor:
     description: wordpress database instance size
-    type: String
+    type: string
     default: 1GB Instance
     constrants:
     - allowed_values:
@@ -84,7 +84,7 @@ parameters:
 
   db_volume_size:
     description : wordpress database volume size (in GB)
-    type: Number
+    type: number
     default: 30
     constraints:
     - range:
@@ -94,7 +94,7 @@ parameters:
 
   db_instance_name:
     description: the database instance name
-    type: String
+    type: string
     default: WP_Cloud_DB
 
 resources:
@@ -125,18 +125,18 @@ resources:
             "%dbpass%": { get_param: db_password }
 
   db:
-    type: Rackspace::Cloud::DBInstance
+    type: OS::Trove::Instance
     properties:
-      InstanceName: { get_param: db_instance_name }
-      FlavorRef: { get_param: db_flavor }
-      VolumeSize: { get_param: db_volume_size }
-      Users:
-      - Name: { get_param: db_username }
-        Password: { get_param: db_password }
-        Databases:
+      name: { get_param: db_instance_name }
+      flavor: { get_param: db_flavor }
+      size: { get_param: db_volume_size }
+      users:
+      - name: { get_param: db_username }
+        password: { get_param: db_password }
+        databases:
         - { get_param: db_name }
-      Databases:
-      - Name: { get_param: db_name }
+      databases:
+      - name: { get_param: db_name }
 
 outputs:
 
@@ -145,7 +145,7 @@ outputs:
       str_replace:
         template: "http://%ip%/wordpress"
         params:
-          "%ip%": { get_attr: [ php_app, PublicIp ] }
+          "%ip%": { get_attr: [ php_app, accessIPv4 ] }
     description: Public URL for the wordpress blog
 
 

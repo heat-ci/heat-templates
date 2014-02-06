@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: String 
+    type: string 
     default: 1GB Standard Instance
     constraints:
     - allowed_values:
@@ -22,23 +22,23 @@ parameters:
 
   server_name:
     description: the instance name
-    type: String
+    type: string
     default: Wordpress Webserver
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: String
+    type: string
     required: true
  
   db_host:
     description: The database hostname
-    type: String
+    type: string
     default: localhost
 
   db_name:
     default: wordpress
     description: The WordPress database name
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -51,7 +51,7 @@ parameters:
     default: admin
     hidden: true
     description: The WordPress database admin account username
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -64,7 +64,7 @@ parameters:
     default: admin
     hidden: true
     description: The WordPress database admin account password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -101,21 +101,25 @@ resources:
             "%dbuser%": { get_param: db_username }
             "%dbpass%": { get_param: db_password }
 
+mappings:
+  wordpress_addresses:
+    {get_attr: [wordpress, addresses]}
+
 outputs:
   
   public_ip:
-    value: { get_attr: [ wordpress, PublicIp ] }
-    description: The public ip address of the server
+    value: { get_attr: [ wordpress, accessIPv4 ] }
+    description: The public IP address of the server
 
   private_ip:
-    value: { get_attr: [ wordpress, PrivateIp ] }
-    description: The private ip address of the server
+    value: { get_attr: [ wordpress, privateIPv4 ] }
+    description: The private IP address of the server
 
   website_url:
     value:
       str_replace:
         template: http://%ip%/wordpress
         params:
-          "%ip%": { get_attr: [ wordpress, PublicIp ] }
+          "%ip%": { get_attr: [ wordpress, accessIPv4 ] }
     description: URL for Wordpress wiki
 

@@ -7,7 +7,7 @@ parameters:
 
   flavor:
     description: Rackspace Cloud Server flavor
-    type: String 
+    type: string 
     default: 2GB Standard Instance
     constraints:
     - allowed_values:
@@ -20,7 +20,7 @@ parameters:
       description: must be a valid Rackspace Cloud Server flavor large enough to run devstack
 
   image:
-    type: String
+    type: string
     description: Server image id to use
     default: Ubuntu 12.04 LTS (Precise Pangolin)
     constraints:
@@ -33,19 +33,19 @@ parameters:
 
   server_name:
     description: the instance name
-    type: String
+    type: string
     default: Devstack server
 
   key_name:
     description: Nova keypair name for ssh access to the server
-    type: String
+    type: string
     required: true
 
   mysql_pass:
     default: admin
     hidden: true
     description: The database admin account password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -58,7 +58,7 @@ parameters:
     default: admin
     hidden: true
     description: The database admin account password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -71,7 +71,7 @@ parameters:
     default: admin
     hidden: true
     description: The service password which is used by the OpenStack services to authenticate with Keystone.
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -84,7 +84,7 @@ parameters:
     default: admin
     hidden: true
     description: The RabbitMQ service admin password
-    type: String
+    type: string
     constraints:
     - length:
         min: 1
@@ -96,7 +96,7 @@ parameters:
   enable_heat:
     default: "false"
     description: Enable the Heat service in Devstack
-    type: String
+    type: string
     constraints:
     - allowed_values: ["true", "false"]
       description: must be either "true" or "false"
@@ -104,7 +104,7 @@ parameters:
   devstack_branch:
     default: "master"
     description: Devstack branch to clone
-    type: String
+    type: string
 
 resources:
 
@@ -194,9 +194,9 @@ resources:
 outputs:
   
   public_ip:
-    value: { get_attr: [ devstack_server, PublicIp ] }
+    value: { get_attr: [ devstack_server, accessIPv4 ] }
     description: The public ip address of the server
 
   private_ip:
-    value: { get_attr: [ devstack_server, PrivateIp ] }
+    value: { get_attr: [ devstack_server, privateIPv4 ] }
     description: The private ip address of the server
