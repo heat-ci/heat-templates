@@ -99,6 +99,12 @@
       "id": 20,
       "name": "DotNetNuke (with DNS)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/dev/dotnetnuke-dns.template"
+    },
+    {
+      "id": 21,
+      "name": "Open Source Chef Server Installation. Uses Current Stable OmniTruck API.",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/prod/chef-server.template"
     }
+
   ]
 }

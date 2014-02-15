@@ -64,6 +64,12 @@
       "id": 13,
       "name": "Repose Server",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/repose.template"
+    },
+    {
+      "id": 14,
+      "name": "Open Source Chef Server Installation. Uses Current Stable OmniTruck API.",
+      "url": "https://raw.github.com/heat-ci/heat-templates/master/prod/chef-server.template"
     }
+
   ]
 }
