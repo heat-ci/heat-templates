@@ -24,7 +24,7 @@ parameters:
     default: Ubuntu 12.04 LTS (Precise Pangolin)
     constraints:
     - allowed_values:
-      - CentOS 6.5
+      - CentOS 6.4
       - Red Hat Enterprise Linux 6.4
       - Ubuntu 12.04 LTS (Precise Pangolin)
       - Fedora 18 (Spherical Cow)
