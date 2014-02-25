@@ -45,10 +45,8 @@ resources:
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
-        str_replace:
-          template: |
-            #!/bin/bash -v
-            echo "hello world" > /root/hello-world.txt
+        #!/bin/bash -v
+        echo "hello world" > /root/hello-world.txt
 
 outputs:
   public_ip:
