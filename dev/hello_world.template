@@ -1,0 +1,34 @@
+heat_template_version: 2013-05-23
+
+description: |
+  My first Heat template
+
+resources:
+
+  access_key:
+    type: OS::Nova::KeyPair
+    properties:
+      name: hello_key_1
+      save_private_key: true
+
+  my_server:
+    type: Rackspace::Cloud::Server
+    properties:
+      name: rtb-heat-workshop
+      image: Ubuntu 13.10 (Saucy Salamander)
+      flavor: 1 GB Performance
+      key_name: { get_resource: access_key }
+
+outputs:
+
+  "Server ID":
+    value: { get_resource: my_server }
+    description: The server id
+
+  "Server IP":
+    value: { get_att: [ my_server, accessIPv4 ] }
+    description: The server IP address
+
+  "Access Private Key":
+    value: { get_att: [ access_key, private_key ] }
+    description: SSH access private key
