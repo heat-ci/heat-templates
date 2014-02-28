@@ -259,7 +259,37 @@ resources:
         properties:
             private_key: {get_attr: [ssh_key, private_key]}
             host: {get_attr: [wordpress_server, accessIPv4]}
-            Berksfile: "https://raw2.github.com/heat-ci/heat-templates/master/dev/chef_wordpress_berksfile"
+            Berksfile: |
+                site :opscode
+                cookbook 'chef-client'
+                cookbook 'memcached'
+                cookbook 'build-essential'
+                cookbook 'apt',
+                    git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                    rel: 'apt'
+                cookbook 'chef-solo-search'
+                cookbook 'firewall',
+                    git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                    rel: 'firewall'
+                cookbook 'apache2',
+                    git: 'https://github.com/opscode-cookbooks/apache2.git'
+                cookbook 'php',
+                  git: 'https://github.com/opscode-cookbooks/php.git'
+                cookbook 'lsyncd',
+                  git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                  rel: 'checkmate-solo-lsyncd'
+                cookbook 'varnish',
+                  git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                  rel: 'checkmate-solo-varnish'
+                cookbook 'monit',
+                  git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                  rel: 'monit'
+                cookbook 'vsftpd',
+                  git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                  rel: 'checkmate-solo-vsftpd'
+                cookbook 'wordpress',
+                  git: 'github_heat_cookbooks:rackerlabs/heat-cookbooks.git',
+                  rel: 'checkmate-solo-wordpress'
 
             node:
                 deployment:
