@@ -6,26 +6,21 @@ description: |
 parameters:
   keypair_name:
     type: string
-    required: true
 
   stack_id:
     type: string
-    required: true
     default: "mysql_stack"
 
   mysql_server_flavor:
     type: string
-    required: true
     default: "performance1-1"
 
   mysql_server_name:
     type: string
-    required: true
     default: "mysql_server"
 
   mysql_root_password:
     type: string
-    required: true
     default: "verybadpass123"
 
   database_name:
@@ -34,22 +29,18 @@ parameters:
 
   database_username:
     type: string
-    required: true
     default: "mysql_user"
 
   database_password:
     type: string
-    required: true
     default: "verybadpass123"
 
   keypair_name:
     type: string
-    required: true
     default: "badkeypair"
 
   private_key:
    type: string
-   required: true
    default: "badprivatekey"
 
 resources:

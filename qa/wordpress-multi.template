@@ -30,7 +30,6 @@ parameters:
   key_name:
     description: nova keypair to use for ssh access to the web nodes
     type: string
-    required: true
 
   db_name:
     default: wordpress

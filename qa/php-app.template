@@ -28,12 +28,10 @@ parameters:
   key_name:
     description: Nova keypair name for ssh access to the server
     type: string
-    required: true
  
   git_url:
     description: URL of a Git repository containing the PHP code.
     type: string
-    required: true
     
 
 resources:

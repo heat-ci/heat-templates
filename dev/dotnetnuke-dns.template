@@ -13,7 +13,7 @@ parameters:
     - length:
         min: 1
         max: 64
-    - allowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    - allowed_pattern: "[a-zA-Z][a-zA-Z0-9]*"
       description: must begin with a letter and contain only alphanumeric characters.
     
   image:

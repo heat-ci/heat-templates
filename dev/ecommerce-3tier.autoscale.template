@@ -46,7 +46,6 @@ parameters:
 
   key-name:
     type: string
-    required: true
     description: Name of a nova ssh keypair to use for server access
 
   app_server_name:
