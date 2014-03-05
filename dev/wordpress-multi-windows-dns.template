@@ -71,7 +71,7 @@ parameters:
     description: wordpress database instance size
     type: string
     default: 1GB Instance
-    constrants:
+    constraints:
     - allowed_values:
       - 1GB Instance
       - 2GB Instance
@@ -109,7 +109,7 @@ parameters:
     description: domain record type
     type: string
     default: A
-    constrants:
+    constraints:
     - allowed_values:
       - A
       - AAAA
