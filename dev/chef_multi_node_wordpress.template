@@ -11,6 +11,10 @@ parameters:
     type: string
     default: "webapp_wordpress"
 
+  wordpress_slave_count:
+    type: number
+    default: 1
+
   mysql_server_flavor:
     type: string
     default: "performance1-1"
@@ -125,30 +129,70 @@ resources:
             private_key: {get_attr: [ssh_key, private_key]}
             public_key: {get_attr: [ssh_key, public_key]}
 
-wordpress_master:
-    type: "http://localhost:8000/chef_wordpress_master.template"
-    properties:
-        stack_id: {get_param: stack_id}
-        key_name: {get_param: key_name}
-        private_key: {get_attr: [ssy_key, private_key]}
-        public_key: {get_attr: [ssh_key, public_key]}
-        wordpress_flavor: {get_param: wordpress_flavor}
-        wordpress_server_name: {get_param: wordpress_server_name}
-        wordpress_database_username: {get_param: wordpress_database_username}
-        wordpress_database_password: {get_param: wordpress_database_password}
-        wordpress_username: {get_param: wordpress_username}
-        wordpress_password: {get_param: wordpress_password}
-        prefix: {get_param: prefix}
-        version: {get_param: version}
-        public_sync_key: {get_param: public_sync_key}
-        private_sync_key: {get_param: private_sync_key}
-        ssl_private_key: {get_param: ssl_private_key}
-        ssl_certificate: {get_param: ssl_certificate}
-        ssl_intermediate_key: {get_param: ssl_intermediate_key}
-        wp_auth: {get_param: wp_auth}
-        wp_logged_in: {get_param: wp_logged_in}
-        wp_nonce: {get_param: wp_nonce}
-        wp_secure_auth: {get_param: wp_secure_auth}
+    wordpress_slaves:
+        type: OS::Heat::ResourceGroup
+        properties:
+            count: {get_param: wordpress_slave_count}
+            resource_def:
+                type: "http://localhost:8000/chef_wordpress_slaves.template"
+                properties:
+                    database_name: {get_param: database_name}
+                    database_username: {get_param: database_username}
+                    database_password: {get_param: database_password}
+                    stack_id: {get_param: stack_id}
+                    key_name: {get_param: key_name}
+                    private_key: {get_attr: [ssh_key, private_key]}
+                    public_key: {get_attr: [ssh_key, public_key]}
+                    mysql_root_password: {get_param: mysql_root_password}
+                    wordpress_flavor: {get_param: wordpress_flavor}
+                    wordpress_server_name: {get_param: wordpress_server_name}
+                    wordpress_database_username: {get_param: wordpress_database_username}
+                    wordpress_database_password: {get_param: wordpress_database_password}
+                    wordpress_username: {get_param: wordpress_username}
+                    wordpress_password: {get_param: wordpress_password}
+                    prefix: {get_param: prefix}
+                    version: {get_param: version}
+                    public_sync_key: {get_param: public_sync_key}
+                    private_sync_key: {get_param: private_sync_key}
+                    ssl_private_key: {get_param: ssl_private_key}
+                    ssl_certificate: {get_param: ssl_certificate}
+                    ssl_intermediate_key: {get_param: ssl_intermediate_key}
+                    wp_auth: {get_param: wp_auth}
+                    wp_logged_in: {get_param: wp_logged_in}
+                    wp_nonce: {get_param: wp_nonce}
+                    wp_secure_auth: {get_param: wp_secure_auth}
+                    mysql_host: {get_attr: [mysql_server, mysql_host]}
+
+    wordpress_master:
+        type: "http://localhost:8000/chef_wordpress_master.template"
+        properties:
+            database_name: {get_param: database_name}
+            database_username: {get_param: database_username}
+            database_password: {get_param: database_password}
+            stack_id: {get_param: stack_id}
+            key_name: {get_param: key_name}
+            private_key: {get_attr: [ssh_key, private_key]}
+            public_key: {get_attr: [ssh_key, public_key]}
+            wordpress_flavor: {get_param: wordpress_flavor}
+            mysql_root_password: {get_param: mysql_root_password}
+            wordpress_server_name: {get_param: wordpress_server_name}
+            wordpress_database_username: {get_param: wordpress_database_username}
+            wordpress_database_password: {get_param: wordpress_database_password}
+            wordpress_username: {get_param: wordpress_username}
+            wordpress_password: {get_param: wordpress_password}
+            prefix: {get_param: prefix}
+            version: {get_param: version}
+            public_sync_key: {get_param: public_sync_key}
+            private_sync_key: {get_param: private_sync_key}
+            ssl_private_key: {get_param: ssl_private_key}
+            ssl_certificate: {get_param: ssl_certificate}
+            ssl_intermediate_key: {get_param: ssl_intermediate_key}
+            wp_auth: {get_param: wp_auth}
+            wp_logged_in: {get_param: wp_logged_in}
+            wp_nonce: {get_param: wp_nonce}
+            wp_secure_auth: {get_param: wp_secure_auth}
+            mysql_host: {get_attr: [mysql_server, mysql_host]}
+            wordpress_slaves: {get_attr: [wordpress_slaves, privateIPv4]}
 
 outputs:
     private_key:

@@ -4,10 +4,26 @@ description: |
   Configures a cloud server with wordpress using chef solo.
 
 parameters:
+    wordpress_slaves:
+        type: comma_delimited_list
+        default: []
+
     stack_id:
         type: string
 
     key_name:
+        type: string
+
+    database_name:
+        type: string
+
+    database_username:
+        type: string
+
+    database_password:
+        type: string
+
+    mysql_root_password:
         type: string
 
     private_key:
@@ -16,75 +32,61 @@ parameters:
     public_key:
         type: string
 
-     wordpress_flavor:
+    wordpress_flavor:
         type: string
-        default: "performance1-1"
 
-      wordpress_server_name:
+    wordpress_server_name:
         type: string
-        default: "wordpress_server"
 
-      wordpress_database_username:
+    wordpress_database_username:
         type: string
-        default: "wp_dbuser"
 
-      wordpress_database_password:
+    wordpress_database_password:
         type: string
-        default: "verybadpass123"
 
-      wordpress_username:
+    wordpress_username:
         type: string
-        default: wordpress_admin
 
-      wordpress_password:
+    wordpress_password:
         type: string
-        default: "verybadpass123"
 
-      prefix:
+    prefix:
         type: string
-        default: wp
 
-      version:
+    version:
         type: string
-        default: 3.6.1
 
-      public_sync_key:
+    public_sync_key:
         type: string
         description: the key to be used by lsyncd clients
-        default: "public_sync_key"
 
-      private_sync_key:
+    private_sync_key:
         type: string
         description: the key to be used by the lsyncd server
-        default: "private_sync_key"
 
-      ssl_private_key:
+    ssl_private_key:
         type: string
-        default: "ssl_private_key"
 
-      ssl_certificate:
+    ssl_certificate:
         type: string
-        default: "ssl_certificate"
 
-      ssl_intermediate_key:
+    ssl_intermediate_key:
         type: string
-        default: "ssl_intermediate_key"
 
-      wp_auth:
+    wp_auth:
         type: string
-        default: "wp_auth"
 
-      wp_logged_in:
+    wp_logged_in:
         type: string
-        default: "wp_logged_in"
 
-      wp_nonce:
+    wp_nonce:
         type: string
-        default: "wp_nonce"
 
-      wp_secure_auth:
+    wp_secure_auth:
         type: string
-        default: "wp_secure_auth"
+
+    mysql_host:
+        type: string
 
 resources:
     wordpress_server:
@@ -96,7 +98,6 @@ resources:
             key_name: {get_param: key_name}
 
     install_wordpress_apt:
-        DependsOn: "mysql_config"
         type: "OS::Heat::ChefSolo"
         properties:
             username: root
@@ -112,7 +113,7 @@ resources:
 
     install_wordpress_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_wordpress_apt
+        depends_on: install_wordpress_apt
         properties:
             username: root
             private_key: {get_param: private_key}
@@ -124,7 +125,7 @@ resources:
                 run_list: ["recipe[build-essential]"]
 
     wordpress_master: 
-        DependsOn: "install_wordpress_make"
+        depends_on: "install_wordpress_make"
         type: "OS::Heat::ChefSolo"
         properties:
             private_key: {get_param: private_key}
@@ -183,7 +184,7 @@ resources:
                         database:
                             create_db_user: true
                             create_db: true
-                            host: {get_attr: [mysql_server, privateIPv4]}
+                            host: {get_param: mysql_host}
                             database_name: {get_param: database_name}
                             server_root_password: {get_param: mysql_root_password}
                             password: {get_param: database_password}
@@ -204,7 +205,7 @@ resources:
                             ssh_private_key: {get_param: private_key}
                             name: {get_param: wordpress_username}
                             password: {get_param: wordpress_password}
-                        slaves: [{get_attr: [wordpress_server, privateIPv4]}]
+                        slaves: {get_param: wordpress_slaves}
                     apache:
                         domain_name: {get_attr: [wordpress_server, accessIPv4]}
                         path: "/"
