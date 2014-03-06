@@ -4,7 +4,7 @@ description: |
   Configures a cloud server with chef-solo
 
 parameters:
-  keypair_name:
+  key_name:
     type: string
 
   stack_id:
