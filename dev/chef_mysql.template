@@ -1,65 +1,42 @@
 heat_template_version: 2013-05-23
 
 description: |
-  Configures a cloud server with chef-solo
+  Configures a cloud server with mysql using chef solo.
 
 parameters:
-  keypair_name:
-    type: string
-    required: true
+    stack_id:
+        type: string
 
-  stack_id:
-    type: string
-    required: true
-    default: "mysql_stack"
+    mysql_server_flavor:
+        type: string 
 
-  mysql_server_flavor:
-    type: string
-    required: true
-    default: "performance1-1"
+    mysql_root_password:
+        type: string
 
-  mysql_server_name:
-    type: string
-    required: true
-    default: "mysql_server"
+    database_name:
+        type: string
+        default: "wordpress_db"
 
-  mysql_root_password:
-    type: string
-    required: true
-    default: "verybadpass123"
+    key_name:
+        type: string
 
-  database_name:
-    type: string
-    default: "mysql_database"
+    private_key:
+        type: string
 
-  database_username:
-    type: string
-    required: true
-    default: "mysql_user"
+    public_key:
+        type: string
 
-  database_password:
-    type: string
-    required: true
-    default: "verybadpass123"
-
-  keypair_name:
-    type: string
-    required: true
-    default: "badkeypair"
-
-  private_key:
-   type: string
-   required: true
-   default: "badprivatekey"
+    mysql_server_name:
+        type: string
 
 resources:
     mysql_server:
-        type: "Rackspace::Cloud::Server"
-        properties:
-            flavor: {get_param: mysql_server_flavor}
-            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
-            name: { get_param: mysql_server_name }
-            key_name: {get_param: keypair_name}
+            type: "Rackspace::Cloud::Server"
+            properties:
+                flavor: {get_param: mysql_server_flavor}
+                image: "Ubuntu 12.04 LTS (Precise Pangolin)"
+                name: {get_param: mysql_server_name}
+                key_name: {get_param: key_name}
 
     update_apt:
         type: "OS::Heat::ChefSolo"
@@ -121,8 +98,8 @@ resources:
                 mysql:
                     server_root_password: {get_param: mysql_root_password}
                 run_list: [
-                    "recipe[build-essential]",
                     "recipe[apt]",
+                    "recipe[build-essential]",
                     "recipe[chef-solo-search]",
                     "recipe[firewall]",
                     "recipe[mysql::server]",
@@ -136,8 +113,11 @@ resources:
                     encrypted: true
                     id: {get_param: stack_id}
                     mysql:
+                        host: {get_attr: [mysql_server, privateIPv4]}
                         database_name: {get_param: database_name}
 
 outputs:
-    private_key:
-        value: {get_param: private_key}
+    mysql_root_password:
+        value: { get_param: mysql_root_password }
+    mysql_host:
+        value: { get_attr: [mysql_server, accessIPv4] }
