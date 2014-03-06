@@ -110,7 +110,7 @@ resources:
     ssh_key:
         type: "OS::Nova::KeyPair"
         properties:
-            name: {get_param: keypair_name}
+            name: {get_param: key_name}
             save_private_key: true
 
     mysql_server:
@@ -329,7 +329,7 @@ outputs:
     public_key:
         value: { get_attr: [ssh_key, public_key] }
     key_name:
-        value: {get_param: keypair_name}
+        value: {get_param: key_name}
     mysql_root_password:
         value: { get_param: mysql_root_password }
     mysql_host:
