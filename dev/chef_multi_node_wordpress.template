@@ -137,7 +137,7 @@ resources:
 
     install_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: update_apt
+        depends_on: update_apt
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
@@ -150,7 +150,7 @@ resources:
 
     mysql_config: 
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_make
+        depends_on: install_make
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
@@ -208,7 +208,7 @@ resources:
             key_name: {Ref: ssh_key}
 
     install_wordpress_apt:
-        DependsOn: "mysql_config"
+        depends_on: "mysql_config"
         type: "OS::Heat::ChefSolo"
         properties:
             username: root
@@ -224,7 +224,7 @@ resources:
 
     install_wordpress_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_wordpress_apt
+        depends_on: install_wordpress_apt
         properties:
             username: root
             private_key: {get_attr: [ssh_key, private_key]}
@@ -236,7 +236,7 @@ resources:
                 run_list: ["recipe[build-essential]"]
 
     wordpress_master: 
-        DependsOn: "install_wordpress_make"
+        depends_on: "install_wordpress_make"
         type: "OS::Heat::ChefSolo"
         properties:
             private_key: {get_attr: [ssh_key, private_key]}

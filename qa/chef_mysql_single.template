@@ -68,7 +68,7 @@ resources:
 
     install_make:
         type: "OS::Heat::ChefSolo"
-        DependsOn: update_apt
+        depends_on: update_apt
         properties:
             username: root
             private_key: {get_param: private_key}
@@ -81,7 +81,7 @@ resources:
 
     mysql_config: 
         type: "OS::Heat::ChefSolo"
-        DependsOn: install_make
+        depends_on: install_make
         properties:
             username: root
             private_key: {get_param: private_key}
