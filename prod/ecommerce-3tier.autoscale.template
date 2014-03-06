@@ -1,0 +1,439 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Demo template for a three tiered environment with a search cluster to host an E-commerce application
+
+parameters:
+  db_name:
+    type: string
+    description: Database name
+    default: ecommercedb
+    constraints:
+      - length: { min: 1, max: 64 }
+        description: db_name must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: db_name must begin with a letter and contain only alphanumeric characters
+  db_username:
+    type: string
+    description: The database admin account username
+    default: admin
+    hidden: false
+    constraints:
+      - length: { min: 1, max: 16 }
+        description: db_username must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: db_username must begin with a letter and contain only alphanumeric characters
+  db_password:
+    type: string
+    description: The database admin account password
+    default: admin
+    hidden: true
+    constraints:
+      - length: { min: 1, max: 41 }
+        description: db_username must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z0-9]*'
+        description: db_password must contain only alphanumeric characters
+#  db_root_password:
+#    type: string
+#    description: Root password for MySQL
+#    default: admin
+#    hidden: false
+#    constraints:
+#      - length: { min: 1, max: 41 }
+#        description: db_username must be between 1 and 64 characters
+#      - allowed_pattern: '[a-zA-Z0-9]*'
+#        description: db_password must contain only alphanumeric characters
+
+  key-name:
+    type: string
+    description: Name of a nova ssh keypair to use for server access
+
+  app_server_name:
+    description: Base name for the application servers
+    type: string
+    default: app-server
+
+  web_server_name:
+    description: Base name for the web servers
+    type: string
+    default: web-server
+
+  search_server_name:
+    description: Base name for the search index servers
+    type: string
+    default: search-server
+
+  db_server_name:
+    description: Master database server name
+    type: string
+    default: db-server
+    
+  image:
+    type: string
+    description: Server image id to use
+    default: bced783b-31d2-4637-b820-fa02522c518b
+    constraints:
+# CentOS64, RHEL64, SL64
+    - allowed_values:
+      - f70ed7c7-b42e-4d77-83d8-40fa29825b85
+      - c6e2fed0-75bf-420d-a744-7cfc75a1889e
+      - bced783b-31d2-4637-b820-fa02522c518b
+      description: USERDATA is made to work with Red Hat flavors and clones
+
+  app_server_flavor:
+    description: Server flavor for the Application servers
+    type: string
+    default: 6
+
+  web_server_flavor:
+    description: Server flavor for the Web servers
+    type: string
+    default: 5
+
+  search_server_flavor:
+    description: Server flavor for the Search servers
+    type: string
+    default: 4
+  
+  db_server_flavor:
+    description: Server flavor for the Database servers
+    type: string
+    default: 15GB Standard Instance
+    constraints:
+    - allowed_values:
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance 
+      - 2 GB Performance
+      - 4 GB Performance
+      - 8 GB Performance
+      - 15 GB Performance
+      - 30 GB Performance
+      - 60 GB Performance
+      - 90 GB Performance
+      - 120 GB Performance
+      description: must be a valid Rackspace Cloud Server flavor.
+      
+      
+# END PARAMS SECTION ###########################################
+
+# START RESOURCES SECTION ######################################
+resources:
+
+  ext_lb:
+    type: Rackspace::Cloud::LoadBalancer
+    properties:
+      nodes: []
+      protocol: TCP
+      port: 80
+      virtualIps:
+        - {"type": "PUBLIC", "ipVersion": "IPV4"}
+  
+  int_search_lb:
+    type: Rackspace::Cloud::LoadBalancer
+    properties:
+      nodes: []
+      protocol: TCP
+      port: 8983
+      virtualIps:
+        - {"type": "SERVICENET", "ipVersion": "IPV4"}
+
+  int_app_lb:
+    type: Rackspace::Cloud::LoadBalancer
+    properties:
+      nodes: []
+      protocol: TCP
+      port: 80
+      virtualIps:
+        - {"type": "SERVICENET", "ipVersion": "IPV4"}
+
+
+# WEB SERVERS AUTOSCALING GROUP DEFINITION #
+  as_group_web_servers:
+    type: Rackspace::AutoScale::Group
+    properties: 
+      groupConfiguration:
+        name: web-servers-as-group
+        cooldown: 60
+        minEntities: 2
+        maxEntities: 10
+        metadata:
+          cool_factor: "50"
+      launchConfiguration:
+        type: launch_server
+        args:
+          server: 
+            name: { get_param: web_server_name }
+            key_name: { get_param: key-name }
+            imageRef: { get_param: image }
+            flavorRef: { get_param: web_server_flavor }
+            config_drive: true
+            metadata: 
+              hotness_factor: "100"
+            networks:
+              - uuid: "00000000-0000-0000-0000-000000000000"
+              - uuid: "11111111-1111-1111-1111-111111111111"
+            user_data:
+              str_replace:
+                template: |
+                  #!/bin/bash -v
+                  service iptables save
+                  service iptables stop
+                  chkconfig iptables off
+                  yum -y install httpd
+                  chkconfig httpd on
+                  service httpd start
+          loadBalancers:
+            -
+              loadBalancerId: { get_resource: ext_lb }
+              port: 80
+
+  as_group_web_servers_inc_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: { get_resource: as_group_web_servers }
+      name: web_servers_increment_01
+      change: 1
+      cooldown: 59
+      type: webhook
+
+  as_group_web_servers_dec_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: {get_resource: as_group_web_servers }
+      name: web_servers_decrement_01
+      change: -1
+      cooldown: 59
+      type: webhook
+
+  as_group_web_servers_inc_policy_01_inc_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_web_servers_inc_policy_01 }
+      name: webservers_inc_webhook_01
+      metadata:
+        is_cool: "true"
+
+  as_group_web_servers_dec_policy_01_dec_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_web_servers_dec_policy_01 }
+      name: webservers_dec_webhook_01
+      metadata:
+        is_cool: "false"
+
+# APPLICATION SERVERS AUTOSCALING GROUP DEFINITION #
+  as_group_app_servers:
+    type: Rackspace::AutoScale::Group
+    properties: 
+      groupConfiguration:
+        name: app-servers-as-group
+        cooldown: 60
+        minEntities: 2
+        maxEntities: 5
+        metadata:
+          cool_factor: "50"
+      launchConfiguration:
+        type: launch_server
+        args:
+          server: 
+            name: { get_param: app_server_name }
+            key_name: { get_param: key-name }
+            imageRef: { get_param: image }
+            flavorRef: { get_param: app_server_flavor }
+            config_drive: true
+            metadata: 
+              hotness_factor: "100"
+            networks:
+                - uuid: "00000000-0000-0000-0000-000000000000"
+                - uuid: "11111111-1111-1111-1111-111111111111"
+            user_data:
+              str_replace:
+                template: |
+                  #!/bin/bash -v
+                  service iptables save
+                  service iptables stop
+                  chkconfig iptables off
+
+                  yum -y install java
+                  yum -y install tomcat6 tomcat6-webapps tomcat6-admin-webapps
+                  chkconfig tomcat6 on
+                  service tomcat6 start
+          loadBalancers:
+            -
+              loadBalancerId: { get_resource: int_app_lb }
+              port: 8080
+
+  as_group_app_servers_inc_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: { get_resource: as_group_app_servers }
+      name: app_servers_increment_01
+      change: 1
+      cooldown: 59
+      type: webhook
+
+  as_group_app_servers_dec_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: {get_resource: as_group_app_servers }
+      name: app_servers_decrement_01
+      change: -1
+      cooldown: 59
+      type: webhook
+
+  as_group_app_servers_inc_policy_01_inc_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_app_servers_inc_policy_01 }
+      name: appservers_inc_webhook_01
+      metadata:
+        is_cool: "true"
+
+  as_group_app_servers_dec_policy_01_dec_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_app_servers_dec_policy_01 }
+      name: appservers_dec_webhook_01
+      metadata:
+        is_cool: "false"
+
+
+# SEARCH SERVERS AUTOSCALING GROUP DEFINITION #
+  as_group_search_servers:
+    type: Rackspace::AutoScale::Group
+    properties: 
+      groupConfiguration:
+        name: search-servers-as-group
+        cooldown: 60
+        minEntities: 2
+        maxEntities: 4
+        metadata:
+          cool_factor: "50"
+      launchConfiguration:
+        type: launch_server
+        args:
+          server: 
+            name: { get_param: search_server_name }
+            key_name: { get_param: key-name }
+            imageRef: { get_param: image }
+            flavorRef: { get_param: search_server_flavor }
+            config_drive: true
+            metadata: 
+              hotness_factor: "100"
+            networks:
+              - uuid: "00000000-0000-0000-0000-000000000000"
+              - uuid: "11111111-1111-1111-1111-111111111111"
+            user_data:
+              str_replace:
+                template: |
+                  #!/bin/bash -v
+                  service iptables save
+                  service iptables stop
+                  chkconfig iptables off
+
+                  yum -y install java
+                  yum -y install tomcat6 tomcat6-webapps tomcat6-admin-webapps
+                  chkconfig tomcat6 on
+                  service tomcat6 start
+          loadBalancers:
+            -
+              loadBalancerId: { get_resource: int_search_lb }
+              port: 8983
+
+  as_group_search_servers_inc_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: { get_resource: as_group_search_servers }
+      name: search_servers_increment_01
+      change: 1
+      cooldown: 59
+      type: webhook
+
+  as_group_search_servers_dec_policy_01:
+    type: Rackspace::AutoScale::ScalingPolicy
+    properties:
+      group: {get_resource: as_group_search_servers }
+      name: search_servers_decrement_01
+      change: -1
+      cooldown: 59
+      type: webhook
+
+  as_group_search_servers_inc_policy_01_inc_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_search_servers_inc_policy_01 }
+      name: searchservers_inc_webhook_01
+      metadata:
+        is_cool: "true"
+
+  as_group_search_servers_dec_policy_01_dec_webhook_01:
+    type: Rackspace::AutoScale::WebHook
+    properties:
+      policy: { get_resource: as_group_search_servers_dec_policy_01 }
+      name: searchservers_dec_webhook_01
+      metadata:
+        is_cool: "false"
+
+# DB SERVERS SECTION - THERE IS NO AUTOSCALING HERE
+  master_db:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: db_server_name }
+      image: Scientific Linux 6.4
+      flavor: { get_param: db_server_flavor }
+      key_name: { get_param: key-name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            service iptables save
+            service iptables stop
+            chkconfig iptables off
+
+            yum -y install mysql mysql-server
+            systemctl enable mysqld.service
+            systemctl start mysqld.service
+                                                                                    
+            # Setup MySQL root password and create a user
+            mysqladmin -u root password %db_rootpassword%
+            cat << EOF | mysql -u root --password=%db_rootpassword%
+            CREATE DATABASE %db_name%;
+            GRANT ALL PRIVILEGES ON %db_name%.* TO "%db_user%"@"localhost"
+            IDENTIFIED BY "%db_password%";
+            FLUSH PRIVILEGES;
+            EXIT
+            EOF
+          
+          params:
+            "%db_rootpassword%": "admin"
+            "%db_name%": { get_param: db_name }
+            "%db_user%": { get_param: db_username }
+            "%db_password%": { get_param: db_password } 
+
+
+
+outputs:
+  web_increment_url:
+    description: POST to this URL to add a WEB server
+    value: {get_attr: [webservers_inc_webhook_01, capabilityUrl]}
+  web_decrement_url:
+    description: POST to this URL to remove a WEB server
+    value: {get_attr: [webservers_dec_webhook_01, capabilityUrl]}
+  app_increment_url:
+    description: POST to this URL to add an APP server
+    value: {get_attr: [appservers_inc_webhook_01, capabilityUrl]}
+  app_decrement_url:
+    description: POST to this URL to remove an APP server
+    value: {get_attr: [appservers_dec_webhook_01, capabilityUrl]}
+  search_increment_url:
+    description: POST to this URL to add a SEARCH server
+    value: {get_attr: [searchservers_inc_webhook_01, capabilityUrl]}
+  search_decrement_url:
+    description: POST to this URL to remove a SEARCH server
+    value: {get_attr: [webservers_dec_webhook_01, capabilityUrl]}
+  db_ip:
+    description: IP Address for the DB server
+    value: { get_attr: [master_db, first_address] }
