@@ -155,7 +155,7 @@ resources:
             fi
             echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
 
-            sudo -u stack ~stack/devstack/stack.sh
+            sudo -i -u stack bash -c "~stack/devstack/stack.sh"
 
             # Add the SSH key to the stack user
             mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
