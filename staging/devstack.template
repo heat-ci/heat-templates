@@ -169,7 +169,7 @@ resources:
             [[ "%enable_heat%" != "true" ]] && exit 0
 
             # Download convenience functions for Heat
-            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile
+            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~stack/.bash_profile
             source ~stack/.bash_profile
 
             # Download & install prebuilt Heat JEOS images
