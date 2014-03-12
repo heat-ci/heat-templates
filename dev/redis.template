@@ -4,17 +4,26 @@ description: |
   Simple template to deploy Redis on a cloud server
 
 parameters:
+
+  server_name:
+    type: string
+    description: Name of the server hosting Redis
+    default:
+      str_replace:
+        template: stack_name_redis_server
+        params:
+          stack_name: { get_param: "OS::stack_name" }
   key_name:
     type: string
-    description: Name of a nova ssh keypair to use for server access
+    description: the name of an existing nova key pair to use for server access
   image:
     type: string
     description: Server image id to use
-    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    default: Ubuntu 13.10 (Saucy Salamander)
     constraints:
     # only tested on Ubuntu images so far
     - allowed_values:
-      - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Ubuntu 13.04 (Raring Ringtail)
       - Ubuntu 13.10 (Saucy Salamander)
       description: must be a valid Ubuntu image id
   flavor:
@@ -34,12 +43,16 @@ parameters:
 
 resources:
   redis:
-    type: Rackspace::Cloud::Server
+    type: OS::Nova::Server
     properties:
+      name: { get_param: server_name }
       key_name: { get_param: key_name }
       image: { get_param: image }
       flavor: { get_param: flavor }
+      user_data_format: RAW
+      config_drive: "true"
       user_data: |
+        #!/bin/bash
         apt-get install -y build-essential
         wget http://download.redis.io/releases/redis-2.6.16.tar.gz 
         tar xzf redis-2.6.16.tar.gz 
