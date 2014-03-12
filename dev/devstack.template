@@ -8,11 +8,9 @@ parameters:
   flavor:
     description: Rackspace Cloud Server flavor
     type: string 
-    default: 2GB Standard Instance
+    default: 4GB Standard Instance
     constraints:
     - allowed_values:
-      - 1GB Standard Instance
-      - 2GB Standard Instance
       - 4GB Standard Instance
       - 8GB Standard Instance
       - 15GB Standard Instance
@@ -155,7 +153,7 @@ resources:
             fi
             echo "SERVICE_TOKEN=$(openssl rand -hex 10)" >> localrc
 
-            sudo -u stack ~stack/devstack/stack.sh
+            sudo -i -u stack bash -c "~stack/devstack/stack.sh"
 
             # Add the SSH key to the stack user
             mkdir ~stack/.ssh && chmod 700 ~stack/.ssh
@@ -169,7 +167,7 @@ resources:
             [[ "%enable_heat%" != "true" ]] && exit 0
 
             # Download convenience functions for Heat
-            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~/.bash_profile
+            curl https://raw.github.com/jasondunsmore/heat-shell/master/functions > ~stack/.bash_profile
             source ~stack/.bash_profile
 
             # Download & install prebuilt Heat JEOS images
