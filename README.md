@@ -1,3 +1,9 @@
+THIS REPOSITORY IS DEPRICATED!!!
+================================
+We are in the process of moving this repository and its contents to https://github.com/rackspace-orchestration-templates/sample-templates. This repository will remain for a week or so, but please pull request new example templates and bug-fixes to the new repositories and not this one.
+
+Internal Rackspace users will have a new repository for templates used in internal CI/CD jobs.
+
 Heat Example Templates
 ======================
 
