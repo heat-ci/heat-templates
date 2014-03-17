@@ -52,7 +52,8 @@ resources:
       user_data_format: RAW
       config_drive: "true"
       user_data: |
-        #!/bin/bash
+        #!/bin/bash -xv
+        apt-get update
         apt-get install -y build-essential
         wget http://download.redis.io/releases/redis-2.6.16.tar.gz 
         tar xzf redis-2.6.16.tar.gz 
