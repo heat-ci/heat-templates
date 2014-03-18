@@ -43,7 +43,7 @@ resources:
       image: { get_param: image_id }
       name: { get_param: server_name }
       key_name: { get_param: key_name }
-      user_data:
+      user_data: |
         #!/bin/bash -v
         echo "hello world" > /root/hello-world.txt
 

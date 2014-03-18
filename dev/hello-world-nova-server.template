@@ -45,7 +45,7 @@ resources:
       key_name: { get_param: key_name }
       config_drive: "true"
       user_data_format: RAW
-      user_data:
+      user_data: |
         #!/bin/bash -xv
         echo "hello world" > /root/hello-world.txt
 
