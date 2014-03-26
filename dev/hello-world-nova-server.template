@@ -37,14 +37,16 @@ parameters:
 resources:
 
   hello_world:
-    type: "Rackspace::Cloud::Server"
+    type: "OS::Nova::Server"
     properties:
       flavor: { get_param: flavor }
       image: { get_param: image_id }
       name: { get_param: server_name }
       key_name: { get_param: key_name }
-      user_data:
-        #!/bin/bash -v
+      config_drive: "true"
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash -xv
         echo "hello world" > /root/hello-world.txt
 
 outputs:
