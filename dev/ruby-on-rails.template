@@ -49,7 +49,7 @@ resources:
     type: "Rackspace::Cloud::Server"
     properties:
       flavor: { get_param: flavor }
-      image: Fedora 19 (Schrodinger's Cat) (PVHVM)
+      image: 9bb18efa-45d0-496a-a7b6-48ec4bdc8ab7  # Fedora 19 (Schrodinger's Cat) (PVHVM)
       name: { get_param: server_name }
       key_name: { get_param: key_name }
       user_data:
