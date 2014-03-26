@@ -16,16 +16,6 @@ parameters:
   key_name:
     type: string
     description: the name of an existing nova key pair to use for server access
-  image:
-    type: string
-    description: Server image id to use
-    default: Ubuntu 13.10 (Saucy Salamander)
-    constraints:
-    # only tested on Ubuntu images so far
-    - allowed_values:
-      - Ubuntu 13.04 (Raring Ringtail)
-      - Ubuntu 13.10 (Saucy Salamander)
-      description: must be a valid Ubuntu image id
   flavor:
     description: Server flavor id to use
     type: string
@@ -47,7 +37,7 @@ resources:
     properties:
       name: { get_param: server_name }
       key_name: { get_param: key_name }
-      image: { get_param: image }
+      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
       flavor: { get_param: flavor }
       user_data_format: RAW
       config_drive: "true"
