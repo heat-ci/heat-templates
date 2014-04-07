@@ -108,12 +108,7 @@ resources:
             #!/bin/bash -x
 
             # Install requirements
-            packages="git emacs nmap"
-            if [[ "%image%" == "bba8bce7-403a-4dd6-80e7-0c40dcc7cd06" ]]; then
-                apt-get install -y $packages
-            else
-                yum -y install $packages
-            fi
+            apt-get install -y git emacs nmap
 
             # Configure and install Devstack
             groupadd stack
@@ -175,7 +170,6 @@ resources:
             "%service_pass%": { get_param: service_pass }
             "%enable_heat%": { get_param: enable_heat }
             "%key_name%": { get_param: key_name }
-            "%image%": { get_param: image }
             "%devstack_branch%": { get_param: devstack_branch }
 
 outputs:
