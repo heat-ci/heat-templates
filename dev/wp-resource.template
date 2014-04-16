@@ -100,10 +100,6 @@ resources:
             "%dbuser%": { get_param: db_username }
             "%dbpass%": { get_param: db_password }
 
-mappings:
-  wordpress_addresses:
-    {get_attr: [wordpress, addresses]}
-
 outputs:
   
   public_ip:
