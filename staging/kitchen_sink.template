@@ -48,7 +48,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: kitchen_sink_ops01
-      image: Ubuntu 13.10 (Saucy Salamander)
+      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
       flavor: 4 GB Performance
       key_name: { get_resource: access_key }
       networks:
@@ -154,7 +154,7 @@ resources:
         type: Rackspace::Cloud::Server
         properties:
           name: kitchen_sink_engine
-          image: Ubuntu 13.10 (Saucy Salamander)
+          image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
           flavor: 8 GB Performance
           key_name: { get_resource: access_key }
           networks:

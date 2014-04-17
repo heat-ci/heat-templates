@@ -110,14 +110,14 @@ resources:
     ssh_key:
         type: "OS::Nova::KeyPair"
         properties:
-            name: {get_param: key_name}
+            name: {get_param: keypair_name}
             save_private_key: true
 
     mysql_server:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
-            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
+            image: bba8bce7-403a-4dd6-80e7-0c40dcc7cd06  # Ubuntu 12.04 LTS (Precise Pangolin)
             name: { get_param: mysql_server_name }
             key_name: {Ref: ssh_key}
 
@@ -203,7 +203,7 @@ resources:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: { get_param: wordpress_flavor }
-            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
+            image: bba8bce7-403a-4dd6-80e7-0c40dcc7cd06  # Ubuntu 12.04 LTS (Precise Pangolin)
             name: { get_param: wordpress_server_name }
             key_name: {Ref: ssh_key}
 
@@ -329,7 +329,7 @@ outputs:
     public_key:
         value: { get_attr: [ssh_key, public_key] }
     key_name:
-        value: {get_param: key_name}
+        value: {get_param: keypair_name}
     mysql_root_password:
         value: { get_param: mysql_root_password }
     mysql_host:

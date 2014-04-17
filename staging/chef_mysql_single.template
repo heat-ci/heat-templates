@@ -48,7 +48,7 @@ resources:
         type: "Rackspace::Cloud::Server"
         properties:
             flavor: {get_param: mysql_server_flavor}
-            image: "Ubuntu 12.04 LTS (Precise Pangolin)"
+            image: bba8bce7-403a-4dd6-80e7-0c40dcc7cd06  # Ubuntu 12.04 LTS (Precise Pangolin)
             name: { get_param: mysql_server_name }
             key_name: {get_param: keypair_name}
 

@@ -102,7 +102,7 @@ resources:
     type: Rackspace::Cloud::Server
     properties:
       flavor: { get_param: web_node_flavor }
-      image: CentOS 6.5
+      image: fd8e4f18-9270-4f43-8932-c3719ae2f7fd  # CentOS 6.5
       name: { get_param: web_server_name }
       key_name: { get_param: key_name }
       user_data:
