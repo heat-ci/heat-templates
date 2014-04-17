@@ -2,68 +2,33 @@
   "templates": [
     {
       "id": 1,
-      "name": "Single Instance Redis Server (Linux)",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/redis.template"
-    },
-    {
-      "id": 2,
       "name": "Multi-node Wordpress (Linux)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/wordpress-multi.template"
     },
     {
-      "id": 3,
-      "name": "PHP Application Server (Linux)",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/php-app.template"
-    },
-    {
-      "id": 4,
-      "name": "Devstack (Linux)",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/devstack.template"
-    },
-    {
-      "id": 5,
-      "name": "MySQL Server (Linux)",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/mysql.template"
-    },
-    {
-      "id": 6,
-      "name": "Ruby on Rails Application Server (Linux)",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/ruby-on-rails.template"
-    },
-    {
-      "id": 7,
+      "id": 2,
       "name": "Single-node Wordpress (Windows)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/wordpress-single-winserver.template"
     },
     {
-      "id": 8,
+      "id": 3,
       "name": "Multi-node Wordpress (Windows + LB + Cloud DB)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/wordpress-multinode-windows.template"
     },
     {
-      "id": 9,
+      "id": 4,
       "name": "Single-node Wordpress (Windows + Cloud DB)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/wordpress-winserver-clouddb.template"
     },
     {
-      "id": 10,
+      "id": 5,
       "name": "DotNetNuke Application (Windows)",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/dotnetnuke.template"
     },
     {
-      "id": 11,
+      "id": 6,
       "name": "All-in-one Rackspace Private Cloud",
       "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/rcbops_allinone_inone.template"
-    },
-    {
-      "id": 12,
-      "name": "Single-instance MongoDB server",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/mongodb.template"
-    },
-    {
-      "id": 13,
-      "name": "Repose Server",
-      "url": "https://raw.github.com/heat-ci/heat-templates/master/qa/repose.template"
     }
   ]
 }
