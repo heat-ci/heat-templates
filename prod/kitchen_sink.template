@@ -7,6 +7,10 @@ description: |
 
 parameters:
 
+  domain_name:
+    type: string
+    description: DNS Domain name
+
   db_pass:
     type: string
     hidden: true
@@ -15,10 +19,15 @@ parameters:
 
 resources:
 
+  random_key_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: 8
+
   access_key:
     type: OS::Nova::KeyPair
     properties:
-      name: kitchen_sink
+      name: { get_resource: random_key_name }
       save_private_key: true
 
   priv_network:
@@ -26,23 +35,6 @@ resources:
     properties:
       label: kitchen_sink
       cidr: 192.168.0.0/24
-
-  a_random_string:
-    type: OS::Heat::RandomString
-    properties:
-      length: 8
-
-  # Have to fix region stuff or service type for swift/Cloud Files
-  # object_store:
-  #  type: OS::Swift::Container
-  #  properties:
-  #    name: kitchen_sink_container
-  #    X-Account-Meta:
-  #      email: "rs-heat@lists.rackspace.com"
-  #      author: Austin Heat Team
-  #    X-Container-Meta:
-  #      email: "rs-heat@lists.rackspace.com"
-  #      irc: "#rs-heat on irc.intra.rackspace.corp"
 
   devops_server:
     type: OS::Nova::Server
@@ -67,8 +59,7 @@ resources:
     type: OS::Cinder::VolumeAttachment
     properties:
       instance_uuid: { get_resource: devops_server }
-      volume_id: { get_resource: devops_volume }
-      mountpoint: "/dev/sda"      
+      volume_id: { get_resource: devops_volume }      
 
   api_servers:
     type: Rackspace::AutoScale::Group
@@ -138,10 +129,14 @@ resources:
   service_domain:
     type: Rackspace::Cloud::DNS
     properties:
-      name: kitchensink.rtbtesting.com
-      emailAddress: "admin@kitchensink.rtbtesting.com"
+      name: { get_param: domain_name }
+      emailAddress:
+        str_replace:
+          template: "admin@{domain}"
+          params:
+            "{domain}": { get_param: domain_name }
       records:
-      - name: kitchensink.rtbtesting.com
+      - name: { get_param: domain_name }
         type: A
         data: { get_attr: [api_loadbalancer, PublicIp] }
         
