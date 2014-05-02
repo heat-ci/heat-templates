@@ -168,7 +168,7 @@ resources:
         properties:
           name: kitchen_sink_engine
           image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
-          flavor: 8 GB Performance
+          flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
           networks:
           - uuid: { get_resource: priv_network }
