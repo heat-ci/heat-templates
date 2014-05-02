@@ -58,7 +58,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: kitchen_sink_ops01
-      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      image: 042395fc-728c-4763-86f9-9b0cacb00701 #CentOS 6.5
       flavor: { get_param: devops_flavor }
       key_name: { get_resource: access_key }
       networks:
@@ -87,6 +87,15 @@ resources:
 
          node:
             hello: "hi"
+
+  devops_chefsolo_kitchen_centos:
+    type: "OS::Heat::ChefSolo"
+    properties:
+       private_key: {get_attr: [access_key, private_key]}
+       host: {get_attr: [devops_server, accessIPv4]}
+       kitchen: "https://github.com/heat-ci/heat-templates.git"
+       node:
+         hello: "hi"
 
   devops_volume:
     type: OS::Cinder::Volume
