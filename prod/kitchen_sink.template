@@ -2,8 +2,6 @@ heat_template_version: 2013-05-23
 
 description: |
   Test template using all resources supported on the Rackspace Public Cloud
-  TODO 1. Add Chef resource to configure engine nodes
-       2. Add a template-based resource because why not
 
 parameters:
 
@@ -58,13 +56,44 @@ resources:
     type: OS::Nova::Server
     properties:
       name: kitchen_sink_ops01
-      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      image: 042395fc-728c-4763-86f9-9b0cacb00701 #CentOS 6.5
       flavor: { get_param: devops_flavor }
       key_name: { get_resource: access_key }
       networks:
       - uuid: "00000000-0000-0000-0000-000000000000"
       - uuid: "11111111-1111-1111-1111-111111111111"
       - uuid: { get_resource: priv_network }
+
+  devops_chefsolo_berkshelf: 
+     type: "OS::Heat::ChefSolo"
+     properties:
+         private_key: {get_attr: [access_key, private_key]}
+         host: {get_attr: [devops_server, accessIPv4]}
+         chef_version: "11.12.0"
+         Berksfile: |
+            site :opscode
+            cookbook 'apt'
+
+         Berksfile.lock: |
+            {
+              "sources": {
+                "apt": {
+                  "locked_version": "2.3.8"
+                }
+              }
+            }
+
+         node:
+            hello: "hi"
+
+  devops_chefsolo_kitchen_centos:
+    type: "OS::Heat::ChefSolo"
+    properties:
+       private_key: {get_attr: [access_key, private_key]}
+       host: {get_attr: [devops_server, accessIPv4]}
+       kitchen: "https://github.com/heat-ci/heat-templates.git"
+       node:
+         hello: "hi"
 
   devops_volume:
     type: OS::Cinder::Volume
@@ -166,7 +195,7 @@ resources:
       resource_def:
         type: Rackspace::Cloud::Server
         properties:
-          name: kitchen_sink_engine
+          name: "kitchen_sink_engine_%index%"
           image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
@@ -185,6 +214,40 @@ resources:
       - name: kitchen_sink
         password: { get_param: db_pass }
         databases: [ kitchen_sink_data ]
+
+  # This needs a special image in your catalog to use metadata and user data; basic
+  # test here to make sure we can actually pop the server
+  aws_server:
+    type: AWS::EC2::Instance
+    properties:
+      ImageId: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      InstanceType: { get_param: devops_flavor }
+      KeyName: { get_resource: access_key }
+
+  object_store:
+    type: OS::Swift::Container
+    properties:
+      name: { get_resource: random_key_name }
+
+  ElasticLoadBalancer:
+        type: AWS::ElasticLoadBalancing::LoadBalancer
+        properties:
+            AvailabilityZones: []
+            Instances:
+            - "192.168.6.100"
+            - "192.168.6.101"
+            Listeners: [{
+                LoadBalancerPort: 8945,
+                InstancePort: 80,
+                Protocol: "HTTP"
+            }]
+            HealthCheck:
+                Target: "HTTP:80/"
+                HealthyThreshold: 3
+                UnhealthyThreshold: 10
+                Interval: 10
+                Timeout: 60
+      
 
 outputs:
 
@@ -243,3 +306,7 @@ outputs:
   "Access Private Key":
     value: { get_att: [ access_key, private_key ] }
     description: SSH access private key
+
+  "AWS Server ID":
+    value: { get_resource: aws_server }
+    description: ID of the AWS::EC2::Instance resource

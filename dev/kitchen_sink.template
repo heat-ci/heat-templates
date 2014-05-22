@@ -2,8 +2,6 @@ heat_template_version: 2013-05-23
 
 description: |
   Test template using all resources supported on the Rackspace Public Cloud
-  TODO 1. Add Chef resource to configure engine nodes
-       2. Add a template-based resource because why not
 
 parameters:
 
@@ -197,7 +195,7 @@ resources:
       resource_def:
         type: Rackspace::Cloud::Server
         properties:
-          name: kitchen_sink_engine
+          name: "kitchen_sink_engine_%index%"
           image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
@@ -216,6 +214,40 @@ resources:
       - name: kitchen_sink
         password: { get_param: db_pass }
         databases: [ kitchen_sink_data ]
+
+  # This needs a special image in your catalog to use metadata and user data; basic
+  # test here to make sure we can actually pop the server
+  aws_server:
+    type: AWS::EC2::Instance
+    properties:
+      ImageId: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      InstanceType: { get_param: devops_flavor }
+      KeyName: { get_resource: access_key }
+
+  object_store:
+    type: OS::Swift::Container
+    properties:
+      name: { get_resource: random_key_name }
+
+  ElasticLoadBalancer:
+        type: AWS::ElasticLoadBalancing::LoadBalancer
+        properties:
+            AvailabilityZones: []
+            Instances:
+            - "192.168.6.100"
+            - "192.168.6.101"
+            Listeners: [{
+                LoadBalancerPort: 8945,
+                InstancePort: 80,
+                Protocol: "HTTP"
+            }]
+            HealthCheck:
+                Target: "HTTP:80/"
+                HealthyThreshold: 3
+                UnhealthyThreshold: 10
+                Interval: 10
+                Timeout: 60
+      
 
 outputs:
 
@@ -274,3 +306,7 @@ outputs:
   "Access Private Key":
     value: { get_att: [ access_key, private_key ] }
     description: SSH access private key
+
+  "AWS Server ID":
+    value: { get_resource: aws_server }
+    description: ID of the AWS::EC2::Instance resource
