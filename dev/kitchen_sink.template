@@ -137,7 +137,7 @@ resources:
     type: Rackspace::AutoScale::Group
     properties:
       groupConfiguration:
-        name: kitchen_sink_api_asgroup
+        name: kitchen_sink_api_asgroup_no_personality
         maxEntities: 8
         minEntities: 2
         cooldown: 120
