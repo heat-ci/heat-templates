@@ -133,6 +133,29 @@ resources:
             - uuid: "11111111-1111-1111-1111-111111111111"
             - uuid: { get_resource: priv_network }
 
+  api_servers_no_personality:
+    type: Rackspace::AutoScale::Group
+    properties:
+      groupConfiguration:
+        name: kitchen_sink_api_asgroup_no_personality
+        maxEntities: 8
+        minEntities: 2
+        cooldown: 120
+      launchConfiguration:
+        type: launch_server
+        args:
+          loadBalancers:
+          - loadBalancerId: { get_resource: api_loadbalancer }
+            port: 80
+          server:
+            name: kitchen_sink_api
+            flavorRef: { get_param: api_flavor_ref }
+            imageRef: df27d481-63a5-40ca-8920-3d132ed643d9
+            key_name: { get_resource: access_key }
+            networks:
+            - uuid: "11111111-1111-1111-1111-111111111111"
+            - uuid: { get_resource: priv_network }
+
   api_scale_up_policy:
     type: Rackspace::AutoScale::ScalingPolicy
     properties:
@@ -277,6 +300,10 @@ outputs:
     value: { get_resource: api_servers }
     description: API servers auto scale group ID
 
+  "API servers auto scale group ID":
+    value: { get_resource: api_servers_no_personality }
+    description: API servers auto scale group ID
+    
   "Scale UP API servers webhook":
     value: { get_att: [ api_scale_up_webhook, executeUrl ] }
     description: Scale UP API servers webhook
