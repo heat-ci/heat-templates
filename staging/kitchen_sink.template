@@ -127,6 +127,8 @@ resources:
             flavorRef: { get_param: api_flavor_ref }
             imageRef: df27d481-63a5-40ca-8920-3d132ed643d9
             key_name: { get_resource: access_key }
+            personality:
+                /tmp/testfile: "testfile"
             networks:
             - uuid: "11111111-1111-1111-1111-111111111111"
             - uuid: { get_resource: priv_network }
