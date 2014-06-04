@@ -70,7 +70,7 @@ resources:
             key_name: { get_resource: ssh_key }
 
     bootstrap_server:
-        type: "OS::Heat::ChefSolo"
+        type: "Rackspace::Cloud::ChefSolo"
         properties:
             username: root
             private_key: { get_attr: [ssh_key, private_key] }
@@ -125,7 +125,7 @@ resources:
 
 outputs:
     HEAT_IPv4:
-        value: { get_att: [heat_instance, accessIPv4] }
+        value: { get_attr: [heat_instance, accessIPv4] }
     HEAT_IPv6:
-        value: { get_att: [heat_instance, accessIPv6] }
+        value: { get_attr: [heat_instance, accessIPv6] }
 
