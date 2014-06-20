@@ -56,6 +56,8 @@ resources:
     type: OS::Nova::Server
     properties:
       name: kitchen_sink_ops01
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       image: 042395fc-728c-4763-86f9-9b0cacb00701 #CentOS 6.5
       flavor: { get_param: devops_flavor }
       key_name: { get_resource: access_key }
@@ -64,7 +66,7 @@ resources:
       - uuid: "11111111-1111-1111-1111-111111111111"
       - uuid: { get_resource: priv_network }
 
-  devops_chefsolo_berkshelf: 
+  devops_chefsolo_berkshelf:
      type: "OS::Heat::ChefSolo"
      properties:
          private_key: {get_attr: [access_key, private_key]}
@@ -99,6 +101,8 @@ resources:
     type: OS::Cinder::Volume
     properties:
       name: kitchen_sink_devops_vol
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       size: 100
       description: Created from the kitchen_sink test Heat template
 
@@ -106,13 +110,15 @@ resources:
     type: OS::Cinder::VolumeAttachment
     properties:
       instance_uuid: { get_resource: devops_server }
-      volume_id: { get_resource: devops_volume }      
+      volume_id: { get_resource: devops_volume }
 
   api_servers:
     type: Rackspace::AutoScale::Group
     properties:
       groupConfiguration:
         name: kitchen_sink_api_asgroup
+        metadata:
+          rax-heat: { get_param: "OS::stack_id" }
         maxEntities: 8
         minEntities: 2
         cooldown: 120
@@ -138,6 +144,8 @@ resources:
     properties:
       groupConfiguration:
         name: kitchen_sink_api_asgroup_no_personality
+        metadata:
+          rax-heat: { get_param: "OS::stack_id" }
         maxEntities: 8
         minEntities: 2
         cooldown: 120
@@ -161,6 +169,8 @@ resources:
     properties:
       group: { get_resource: api_servers }
       name: Scale up api servers
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       change: 1
       cooldown: 600
       type: webhook
@@ -169,6 +179,8 @@ resources:
     type: Rackspace::AutoScale::WebHook
     properties:
       name: triggerApiScaleUp
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       policy: { get_resource: api_scale_up_policy }
 
   api_scale_down_policy:
@@ -176,6 +188,8 @@ resources:
     properties:
       group: { get_resource: api_servers }
       name: Scale down api servers
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       change: -1
       cooldown: 600
       type: webhook
@@ -184,12 +198,16 @@ resources:
     type: Rackspace::AutoScale::WebHook
     properties:
       name: triggerApiScaleUp
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       policy: { get_resource: api_scale_down_policy }
 
   api_loadbalancer:
     type: Rackspace::Cloud::LoadBalancer
     properties:
       name: kitchen_sink_api_lb
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       protocol: HTTPS
       port: 80
       algorithm: ROUND_ROBIN
@@ -202,6 +220,8 @@ resources:
     type: Rackspace::Cloud::DNS
     properties:
       name: { get_param: domain_name }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       emailAddress:
         str_replace:
           template: "admin@{domain}"
@@ -211,7 +231,7 @@ resources:
       - name: { get_param: domain_name }
         type: A
         data: { get_attr: [api_loadbalancer, PublicIp] }
-        
+
   engine_nodes:
     type: OS::Heat::ResourceGroup
     depends_on: service_db
@@ -221,6 +241,8 @@ resources:
         type: Rackspace::Cloud::Server
         properties:
           name: "kitchen_sink_engine_%index%"
+          metadata:
+            rax-heat: { get_param: "OS::stack_id" }
           image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
@@ -231,6 +253,8 @@ resources:
     type: OS::Trove::Instance
     properties:
       name: kitchen_sink_db
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
       flavor: 1GB Instance
       size: 10
       databases:
@@ -253,6 +277,8 @@ resources:
     type: OS::Swift::Container
     properties:
       name: { get_resource: random_key_name }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
 
   ElasticLoadBalancer:
         type: AWS::ElasticLoadBalancing::LoadBalancer
@@ -272,7 +298,7 @@ resources:
                 UnhealthyThreshold: 10
                 Interval: 10
                 Timeout: 60
-      
+
 
 outputs:
 
@@ -303,7 +329,7 @@ outputs:
   "API servers auto scale group ID":
     value: { get_resource: api_servers_no_personality }
     description: API servers auto scale group ID
-    
+
   "Scale UP API servers webhook":
     value: { get_attr: [ api_scale_up_webhook, executeUrl ] }
     description: Scale UP API servers webhook
