@@ -169,8 +169,6 @@ resources:
     properties:
       group: { get_resource: api_servers }
       name: Scale up api servers
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
       change: 1
       cooldown: 600
       type: webhook
@@ -188,8 +186,6 @@ resources:
     properties:
       group: { get_resource: api_servers }
       name: Scale down api servers
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
       change: -1
       cooldown: 600
       type: webhook
@@ -220,8 +216,6 @@ resources:
     type: Rackspace::Cloud::DNS
     properties:
       name: { get_param: domain_name }
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
       emailAddress:
         str_replace:
           template: "admin@{domain}"
@@ -241,8 +235,6 @@ resources:
         type: Rackspace::Cloud::Server
         properties:
           name: "kitchen_sink_engine_%index%"
-          metadata:
-            rax-heat: { get_param: "OS::stack_id" }
           image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
@@ -253,8 +245,6 @@ resources:
     type: OS::Trove::Instance
     properties:
       name: kitchen_sink_db
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
       flavor: 1GB Instance
       size: 10
       databases:
@@ -277,8 +267,6 @@ resources:
     type: OS::Swift::Container
     properties:
       name: { get_resource: random_key_name }
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
 
   ElasticLoadBalancer:
         type: AWS::ElasticLoadBalancing::LoadBalancer
