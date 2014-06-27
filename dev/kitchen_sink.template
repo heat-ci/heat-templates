@@ -33,6 +33,15 @@ parameters:
       - performance1-1
       - "3" # 1GB Standard Instance
 
+  image:
+    description: Server Image
+    type: string
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    constraints:
+    - allowed_values:
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      description: Must be a supported operating system.
+
 resources:
 
   random_key_name:
@@ -298,6 +307,13 @@ resources:
                 UnhealthyThreshold: 10
                 Interval: 10
                 Timeout: 60
+
+  provider_resource:
+    type: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/provider_resource.template
+      properties:
+        flavor: { get_param: devops_flavor }
+        image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+        key_name: { get_resource: random_key_name }
 
 
 outputs:
