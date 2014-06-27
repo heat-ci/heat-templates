@@ -241,6 +241,18 @@ resources:
           networks:
           - uuid: { get_resource: priv_network }
 
+  rs_windows_server:
+    type: "Rackspace::Cloud::WinServer"
+    properties:
+      name: wordpress_windows_server
+      flavor: 4GB Standard Instance
+      image: Windows Server 2012
+      user_data: |
+        $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+        $destination = "webpi.msi"
+        $wc = New-Object System.Net.WebClient
+        $wc.DownloadFile($source, $destination)
+
   service_db:
     type: OS::Trove::Instance
     properties:
@@ -353,3 +365,7 @@ outputs:
   "AWS Server ID":
     value: { get_resource: aws_server }
     description: ID of the AWS::EC2::Instance resource
+
+  "Windows Server IP":
+    value: { get_attr: [ rs_windows_server, accessIPv4 ] }
+    description: Windows Server IP
