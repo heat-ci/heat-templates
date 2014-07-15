@@ -293,7 +293,7 @@ outputs:
     description: Private Network ID
 
   "Random String":
-    value: { get_attr: [ a_random_string, value ] }
+    value: { get_attr: [ random_key_name, value ] }
     description: Random String
 
   "Swift Container ID":
