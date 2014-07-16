@@ -293,7 +293,7 @@ outputs:
     description: Private Network ID
 
   "Random String":
-    value: { get_att: [ a_random_string, value ] }
+    value: { get_attr: [ random_key_name, value ] }
     description: Random String
 
   "Swift Container ID":
@@ -317,11 +317,11 @@ outputs:
     description: API servers auto scale group ID
     
   "Scale UP API servers webhook":
-    value: { get_att: [ api_scale_up_webhook, executeUrl ] }
+    value: { get_attr: [ api_scale_up_webhook, executeUrl ] }
     description: Scale UP API servers webhook
 
   "Scale DOWN API servers webhook":
-    value: { get_att: [ api_scale_down_webhook, executeUrl ] }
+    value: { get_attr: [ api_scale_down_webhook, executeUrl ] }
     description: Scale DOWN API servers webhook
 
   "Load Balancer ID":
@@ -329,7 +329,7 @@ outputs:
     description: Load Balancer ID
 
   "Load Balancer IP":
-    value: { get_att: [ api_loadbalancer, PublicIp ] }
+    value: { get_attr: [ api_loadbalancer, PublicIp ] }
     description: Load Balancer IP
 
   "DNS Domain ID":
@@ -337,7 +337,7 @@ outputs:
     description: DNS Domain ID
 
   "Engine Node IDs":
-    value: { get_att: [ engine_nodes, refs ] }
+    value: { get_attr: [ engine_nodes, refs ] }
     description: Engine Node IDs
 
   "DB ID":
@@ -345,7 +345,7 @@ outputs:
     description: Database instance ID
 
   "Access Private Key":
-    value: { get_att: [ access_key, private_key ] }
+    value: { get_attr: [ access_key, private_key ] }
     description: SSH access private key
 
   "AWS Server ID":
