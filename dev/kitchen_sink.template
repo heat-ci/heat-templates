@@ -240,6 +240,9 @@ resources:
           key_name: { get_resource: access_key }
           networks:
           - uuid: { get_resource: priv_network }
+          user_data: |
+            #!/bin/bash -x
+            echo "hello world" > /root/hello-world.txt
 
   rs_windows_server:
     type: "Rackspace::Cloud::WinServer"
