@@ -1,0 +1,21 @@
+heat_template_version: 2013-05-23
+description: A Rackspace server
+parameters:
+  image:
+    type: string
+    description: Image used for servers
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+  key_name:
+    type: string
+    description: SSH key to connect to the servers
+  flavor:
+    type: string
+    description: flavor used by the servers
+    default: 1 GB Performance
+resources:
+  server:
+    type: Rackspace::Cloud::Server
+    properties:
+      flavor: {get_param: flavor}
+      image: {get_param: image}
+      key_name: {get_param: key_name}
