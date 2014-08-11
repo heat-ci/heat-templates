@@ -159,6 +159,9 @@ resources:
           key_name: { get_resource: access_key }
           networks:
           - uuid: { get_resource: priv_network }
+          user_data: |
+            #!/bin/bash -x
+            echo "hello world" > /root/hello-world.txt
 
   service_db:
     type: OS::Trove::Instance
