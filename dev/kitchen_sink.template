@@ -240,6 +240,8 @@ resources:
           key_name: { get_resource: access_key }
           networks:
           - uuid: { get_resource: priv_network }
+          - uuid: "00000000-0000-0000-0000-000000000000"
+          - uuid: "11111111-1111-1111-1111-111111111111"
           user_data: |
             #!/bin/bash -x
             echo "hello world" > /root/hello-world.txt
