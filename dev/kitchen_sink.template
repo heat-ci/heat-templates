@@ -304,10 +304,10 @@ resources:
 
   provider_resource:
     type: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/provider_resource.template
-      properties:
-        flavor: { get_param: devops_flavor }
-        image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
-        key_name: { get_resource: random_key_name }
+    properties:
+      flavor: { get_param: devops_flavor }
+      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      key_name: { get_resource: random_key_name }
 
 outputs:
 
