@@ -307,7 +307,7 @@ resources:
     properties:
       flavor: { get_param: devops_flavor }
       image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
-      key_name: { get_resource: random_key_name }
+      key_name: { get_resource: access_key }
 
 outputs:
 
