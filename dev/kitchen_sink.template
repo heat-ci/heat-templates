@@ -131,7 +131,7 @@ resources:
           server:
             name: kitchen_sink_api
             flavorRef: { get_param: api_flavor_ref }
-            imageRef: df27d481-63a5-40ca-8920-3d132ed643d9
+            imageRef: ffd597d6-2cc4-4b43-b8f4-b1006715b84e
             key_name: { get_resource: access_key }
             personality:
                 /tmp/testfile: "testfile"
