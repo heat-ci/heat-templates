@@ -237,7 +237,7 @@ resources:
       algorithm: ROUND_ROBIN
       nodes: []
       virtualIps:
-      - id: { get_attr: [ http_loadbalancer, virtualIps, 0, id ] }
+      - id: { get_attr: [ api_loadbalancer, virtualIps, 0, id ] }
 
   service_domain:
     type: Rackspace::Cloud::DNS
