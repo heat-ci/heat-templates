@@ -211,22 +211,8 @@ resources:
       virtualIps:
       - type: PUBLIC
         ipVersion: IPV4
-        
-  lb_shared_1:
-    type: Rackspace::Cloud::LoadBalancer
-    properties:
-      name: ksink_shared_vip_http
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
-      protocol: HTTP
-      port: 80
-      algorithm: ROUND_ROBIN
-      nodes: []
-      virtualIps:
-      - type: PUBLIC
-        ipVersion: IPV4
 
-  lb_shared_2:
+  lb_shared_vip:
     type: Rackspace::Cloud::LoadBalancer
     properties:
       name: ksink_shared_vip_https
