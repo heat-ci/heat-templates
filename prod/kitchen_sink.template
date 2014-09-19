@@ -68,6 +68,7 @@ resources:
 
   devops_chefsolo_berkshelf:
      type: "OS::Heat::ChefSolo"
+     depends_on: devops_chefsolo_kitchen_centos
      properties:
          private_key: {get_attr: [access_key, private_key]}
          host: {get_attr: [devops_server, accessIPv4]}
