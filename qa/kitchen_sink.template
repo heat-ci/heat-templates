@@ -5,10 +5,6 @@ description: |
 
 parameters:
 
-  domain_name:
-    type: string
-    description: DNS Domain name
-
   db_pass:
     type: string
     hidden: true
@@ -45,6 +41,9 @@ resources:
     properties:
       name: { get_resource: random_key_name }
       save_private_key: true
+
+  domain_name:
+    type: OS::Heat::RandomString
 
   priv_network:
     type: Rackspace::Cloud::Network
@@ -229,14 +228,26 @@ resources:
   service_domain:
     type: Rackspace::Cloud::DNS
     properties:
-      name: { get_param: domain_name }
+      name:
+        str_replace:
+          template: "a%domain%.com"
+          params:
+            "%domain%": { get_resource: domain_name }
       emailAddress:
         str_replace:
           template: "admin@{domain}"
           params:
-            "{domain}": { get_param: domain_name }
+            "{domain}":
+              str_replace:
+                template: "a%domain%.com"
+                params:
+                  "%domain%": { get_resource: domain_name }
       records:
-      - name: { get_param: domain_name }
+      - name:
+          str_replace:
+            template: "a%domain%.com"
+            params:
+              "%domain%": { get_resource: domain_name }
         type: A
         data: { get_attr: [api_loadbalancer, PublicIp] }
 
