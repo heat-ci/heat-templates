@@ -65,6 +65,25 @@ resources:
       name: ksink-BFV-server
       flavor: 2 GB Performance
       block_device_mapping: [{volume_id: {get_resource: boot_from_vol_vol}, device_name: vda, delete_on_termination: false}]
+  
+  neutron_network:
+    type: OS::Neutron::Net
+    properties:
+      name: ksink-neutron-net
+  
+  neutron_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: ksink-subnet-1
+      network: { get_resource: neutron_network }
+      cidr: 192.168.0.0/24
+      ip_version: 4
+  
+  neutron_port:
+    type: OS::Neutron::Port
+    properties:
+      name: ksink-port-1
+      network: { get_resource: neutron_network }
 
   devops_server:
     type: OS::Nova::Server
