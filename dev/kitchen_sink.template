@@ -50,6 +50,21 @@ resources:
     properties:
       label: kitchen_sink
       cidr: 192.168.0.0/24
+  
+  boot_from_vol_vol:
+    type: OS::Cinder::Volume
+    properties:
+      name: ks-BFV-vol
+      size: 100
+      volume_type: SSD
+      image: CentOS 7 (PVHVM)
+  
+  boot_from_vol_server:
+    type: OS::Nova::Server
+    properties:
+      name: ksink-BFV-server
+      flavor: 2 GB Performance
+      block_device_mapping: [{volume_id: {get_resource: boot_from_vol_vol}, device_name: vda, delete_on_termination: false}]
 
   devops_server:
     type: OS::Nova::Server
