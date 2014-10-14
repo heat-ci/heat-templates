@@ -272,11 +272,16 @@ resources:
   instance1:
     type: OS::Nova::Server
     properties:
-      #image: f9b690bf-88eb-43c2-99cf-391f2558732e  # Ubuntu
       image: 4b14a92e-84c8-4770-9245-91ecb8501cc2  # CentOS
       flavor: 1 GB Performance
-      key_name: jasond
+      key_name: { get_resource: access_key }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+        heat-stack-name: { get_param: "OS::stack_name" }
       config_drive: True
+      networks:
+      - uuid: "11111111-1111-1111-1111-111111111111"
+      - uuid: { get_resource: neutron_network } 
       user_data_format: RAW
       user_data:
         str_replace:
@@ -425,6 +430,12 @@ outputs:
   "Private Network ID":
     value: { get_resource: priv_network }
     description: Private Network ID
+  
+  "Neutron Network":
+    value: { get_resource: neutron_network }
+  
+  "Wait Condition data":
+     value: { get_attr: [ wait_on_server, data ] }
 
   "Random String":
     value: { get_attr: [ random_key_name, value ] }
