@@ -385,14 +385,32 @@ resources:
         password: { get_param: db_pass }
         databases: [ kitchen_sink_data ]
 
-  # This needs a special image in your catalog to use metadata and user data; basic
-  # test here to make sure we can actually pop the server
+  # This needs an image with heat_cfntools on it to use Metadata; basic
+  # test here to make sure we can actually pop the server and do simple
+  # user data and a signal
   aws_server:
     type: AWS::EC2::Instance
     properties:
       ImageId: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
       InstanceType: { get_param: devops_flavor }
       KeyName: { get_resource: access_key }
+      UserData:
+        str_replace:
+          template: |
+            #!/bin/bash
+            sleep(2)
+            curl -i -X PUT --data-binary '{"status": "SUCCESS", "reason": "AWS Signal"}' wc_notify
+          params:
+            wc_notify: { get_resource: aws_handle }
+  
+  aws_handle:
+    type: AWS::CloudFormation::WaitConditionHandle
+  
+  aws_wait_condition:
+    type: AWS::CloudFormation::WaitCondition
+    properties:
+      Handle: { get_resource: aws_handle }
+      Timeout: 600
 
   object_store:
     type: OS::Swift::Container
