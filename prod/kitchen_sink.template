@@ -50,6 +50,46 @@ resources:
     properties:
       label: kitchen_sink
       cidr: 192.168.0.0/24
+  
+  boot_from_vol_vol:
+    type: OS::Cinder::Volume
+    properties:
+      name: ks-BFV-vol
+      size: 100
+      volume_type: SSD
+      image: CentOS 7 (PVHVM)
+  
+  boot_from_vol_server:
+    type: OS::Nova::Server
+    properties:
+      name: ksink-BFV-server
+      flavor: 2 GB Performance
+      block_device_mapping: [{volume_id: {get_resource: boot_from_vol_vol}, device_name: vda, delete_on_termination: false}]
+  
+#  neutron_network:
+#    type: OS::Neutron::Net
+#    properties:
+#      name: ksink-neutron-net
+  
+#  neutron_subnet:
+#    type: OS::Neutron::Subnet
+#    properties:
+#      name: ksink-subnet-1
+#      network: { get_resource: neutron_network }
+#      cidr: 192.168.0.0/24
+#      ip_version: 4
+  
+#  neutron_port:
+#    type: OS::Neutron::Port
+#    properties:
+#      name: ksink-port-1
+#      network: { get_resource: neutron_network }
+
+  gentoo_server:  # Should create as long as there's no user_data
+    type: Rackspace::Cloud::Server
+    properties:
+      flavor: 1 GB Performance
+      image: 26c630fe-ba65-4cd2-ad69-1d808766a54b  # Gentoo 14.4
 
   devops_server:
     type: OS::Nova::Server
@@ -64,12 +104,6 @@ resources:
       - uuid: "00000000-0000-0000-0000-000000000000"
       - uuid: "11111111-1111-1111-1111-111111111111"
       - uuid: { get_resource: priv_network }
-  
-  gentoo_server:  # Should create as long as there's no user_data
-    type: Rackspace::Cloud::Server
-    properties:
-      flavor: 1 GB Performance
-      image: 26c630fe-ba65-4cd2-ad69-1d808766a54b  # Gentoo 14.4
 
   devops_chefsolo_berkshelf:
      type: "OS::Heat::ChefSolo"
@@ -230,9 +264,64 @@ resources:
       nodes: []
       virtualIps:
       - id: { get_attr: [ api_loadbalancer, virtualIps, 0, id ] }
+  
+  wait_on_server:
+    type: OS::Heat::SwiftSignal
+    properties:
+      handle: {get_resource: wait_handle}
+      count: 5
+      timeout: 600
+
+  wait_handle:
+    type: OS::Heat::SwiftSignalHandle
+
+  instance1:
+    type: OS::Nova::Server
+    properties:
+      image: 4b14a92e-84c8-4770-9245-91ecb8501cc2  # CentOS
+      flavor: 1 GB Performance
+      key_name: { get_resource: access_key }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+        heat-stack-name: { get_param: "OS::stack_name" }
+      config_drive: True
+#      networks:
+#      - uuid: "11111111-1111-1111-1111-111111111111"
+#      - uuid: { get_resource: neutron_network } 
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -x
+            # Below are some examples of the various ways signals
+            # can be sent to the Handle resource
+
+            # Simple success signal
+            wc_notify --data-binary '{"status": "SUCCESS"}'
+
+            # Or you optionally can specify any of the additional fields
+            wc_notify --data-binary '{"status": "SUCCESS", "reason": "signal2"}'
+            wc_notify --data-binary '{"status": "SUCCESS", "reason": "signal3", "data": "data3"}'
+            wc_notify --data-binary '{"status": "SUCCESS", "reason": "signal4", "data": "data4"}'
+
+            # If you require control of the ID, you can pass it.
+            # The ID should be unique, unless you intend for duplicate
+            # signals to overrite each other.  The following two calls
+            # do the exact same thing, and will be treated as one signal
+            # (You can prove this by changing count above to 7)
+            wc_notify --data-binary '{"status": "SUCCESS", "id": "5"}'
+            wc_notify --data-binary '{"status": "SUCCESS", "id": "5"}'
+
+            # Example of sending a failure signal, optionally
+            # reason, id, and data can be specified as above
+            # wc_notify --data-binary '{"status": "FAILURE"}'
+
+          params:
+            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
 
   service_domain:
     type: Rackspace::Cloud::DNS
+    depends_on: wait_on_server
     properties:
       name:
         str_replace:
@@ -302,14 +391,32 @@ resources:
         password: { get_param: db_pass }
         databases: [ kitchen_sink_data ]
 
-  # This needs a special image in your catalog to use metadata and user data; basic
-  # test here to make sure we can actually pop the server
+  # This needs an image with heat_cfntools on it to use Metadata; basic
+  # test here to make sure we can actually pop the server and do simple
+  # user data and a signal
   aws_server:
     type: AWS::EC2::Instance
     properties:
       ImageId: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
       InstanceType: { get_param: devops_flavor }
       KeyName: { get_resource: access_key }
+      UserData:
+        str_replace:
+          template: |
+            #!/bin/bash
+            sleep(2)
+            curl -i -X PUT --data-binary '{"status": "SUCCESS", "reason": "AWS Signal"}' wc_notify
+          params:
+            wc_notify: { get_resource: aws_handle }
+  
+  aws_handle:
+    type: AWS::CloudFormation::WaitConditionHandle
+  
+  aws_wait_condition:
+    type: AWS::CloudFormation::WaitCondition
+    properties:
+      Handle: { get_resource: aws_handle }
+      Timeout: 600
 
   object_store:
     type: OS::Swift::Container
@@ -347,6 +454,12 @@ outputs:
   "Private Network ID":
     value: { get_resource: priv_network }
     description: Private Network ID
+  
+  "Neutron Network":
+    value: { get_resource: neutron_network }
+  
+  "Wait Condition data":
+     value: { get_attr: [ wait_on_server, data ] }
 
   "Random String":
     value: { get_attr: [ random_key_name, value ] }
