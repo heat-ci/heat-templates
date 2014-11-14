@@ -85,6 +85,12 @@ resources:
 #      name: ksink-port-1
 #      network: { get_resource: neutron_network }
 
+  gentoo_server:  # Should create as long as there's no user_data
+    type: Rackspace::Cloud::Server
+    properties:
+      flavor: 1 GB Performance
+      image: 26c630fe-ba65-4cd2-ad69-1d808766a54b  # Gentoo 14.4
+
   devops_server:
     type: OS::Nova::Server
     properties:
