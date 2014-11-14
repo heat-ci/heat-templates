@@ -64,6 +64,12 @@ resources:
       - uuid: "00000000-0000-0000-0000-000000000000"
       - uuid: "11111111-1111-1111-1111-111111111111"
       - uuid: { get_resource: priv_network }
+  
+  gentoo_server:  # Should create as long as there's no user_data
+    type: Rackspace::Cloud::Server
+    properties:
+      flavor: 1 GB Performance
+      image: 26c630fe-ba65-4cd2-ad69-1d808766a54b  # Gentoo 14.4
 
   devops_chefsolo_berkshelf:
      type: "OS::Heat::ChefSolo"
