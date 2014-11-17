@@ -104,29 +104,31 @@ resources:
       - uuid: "00000000-0000-0000-0000-000000000000"
       - uuid: "11111111-1111-1111-1111-111111111111"
       - uuid: { get_resource: priv_network }
-
-  devops_chefsolo_berkshelf:
-     type: "OS::Heat::ChefSolo"
-     depends_on: devops_chefsolo_kitchen_centos
-     properties:
-         private_key: {get_attr: [access_key, private_key]}
-         host: {get_attr: [devops_server, accessIPv4]}
-         chef_version: "11.12.0"
-         Berksfile: |
-            site :opscode
-            cookbook 'apt'
-
-         Berksfile.lock: |
-            {
-              "sources": {
-                "apt": {
-                  "locked_version": "2.3.8"
-                }
-              }
-            }
-
-         node:
-            hello: "hi"
+################################################################
+#### THIS IS BROKEN ATM: https://jira.rax.io/browse/HEAT-789 ###
+################################################################
+#  devops_chefsolo_berkshelf:
+#     type: "OS::Heat::ChefSolo"
+#     depends_on: devops_chefsolo_kitchen_centos
+#     properties:
+#         private_key: {get_attr: [access_key, private_key]}
+#         host: {get_attr: [devops_server, accessIPv4]}
+#         chef_version: "11.12.0"
+#         Berksfile: |
+#            site :opscode
+#            cookbook 'apt'
+#
+#         Berksfile.lock: |
+#            {
+#              "sources": {
+#                "apt": {
+#                  "locked_version": "2.3.8"
+#                }
+#              }
+#            }
+#
+#         node:
+#            hello: "hi"
 
   devops_chefsolo_kitchen_centos:
     type: "OS::Heat::ChefSolo"
