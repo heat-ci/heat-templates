@@ -409,7 +409,7 @@ resources:
             #!/bin/bash
             apt-get update
             apt-get -y install curl
-            sleep(2)
+            sleep 2
             curl -i -X PUT --data-binary '{"status": "SUCCESS", "reason": "AWS Signal"}' "wc_notify"
           params:
             wc_notify: { get_resource: aws_handle }
