@@ -375,11 +375,12 @@ resources:
       name: wordpress_windows_server
       flavor: 4GB Standard Instance
       image: Windows Server 2012
-      user_data: |
-        $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
-        $destination = "webpi.msi"
-        $wc = New-Object System.Net.WebClient
-        $wc.DownloadFile($source, $destination)
+#### Commenting out because of memory issues ####
+#      user_data: |
+#        $source = "http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi"
+#        $destination = "webpi.msi"
+#        $wc = New-Object System.Net.WebClient
+#        $wc.DownloadFile($source, $destination)
 
   service_db:
     type: OS::Trove::Instance
