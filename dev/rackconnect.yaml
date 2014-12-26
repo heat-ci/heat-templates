@@ -1,0 +1,50 @@
+heat_template_version: 2014-10-16
+
+description: |
+  Test template using Rackconnect. Parameter defaults should be valid for account
+  rcheatdfwv3 in DFW.
+
+parameters:
+
+  rcnet:
+    type: string
+    description: The uuid of the rc network to use
+    constraints:
+    - custom_constraint: "rackconnect.network"
+    default: "ec473e48-76f6-49bc-9cb2-9863399f9292"
+
+  rcpool:
+    type: string
+    description: The uuid of the Loadbalancer Pool to use
+    constraints:
+    - custom_constraint: "rackconnect.pool"
+    default: POOL_U_FOUND_IT
+
+resources:
+
+  pool_node:
+    type: Rackspace::RackConnect::PoolNode
+    properties:
+      server_id: { get_resource: server }
+      pool: { get_param: rcpool }
+
+  public_ip:
+    type: Rackspace::RackConnect::PublicIP
+    properties:
+      server_id: { get_resource: server }
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+      flavor: 2 GB Performance
+      name: 
+        str_replace:
+          template: stack-server
+          params:
+            stack: { get_param: "OS::stack_name" }
+      networks:
+      - uuid: { get_param: rcnet }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+        stack-name: { get_param: "OS::stack_name" }
