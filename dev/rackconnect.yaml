@@ -15,7 +15,7 @@ parameters:
 
   rcpool:
     type: string
-    description: The uuid of the Loadbalancer Pool to use
+    description: The uuid or name of the Loadbalancer Pool to use
     constraints:
     - custom_constraint: "rackconnect.pool"
     default: POOL_U_FOUND_IT
