@@ -5,5 +5,5 @@ resources:
     type: OS::Nova::Server
     properties:
       flavor: 4 GB Performance
-      image: 2936a16d-ee01-452c-a6ab-7117df5196f8 # Ubuntu 13.10 (Saucy Salamander)
+      image: 7fd88211-ce43-41bf-9a85-e73df4066581 # CentOS
       personality: {/tmp/testfile: testfile}
