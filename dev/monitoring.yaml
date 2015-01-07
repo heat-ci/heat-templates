@@ -13,15 +13,18 @@ resources:
       name: { get_param: "OS::stack_name" }
       user_data_format: RAW
       config_drive: true
-      user_data: |
-        #!/bin/bash
-        echo "deb http://stable.packages.cloudmonitoring.rackspace.com/ubuntu-14.04-x86_64 cloudmonitoring main" > /etc/apt/sources.list.d/rackspace-monitoring-agent.list
-        curl https://monitoring.api.rackspacecloud.com/pki/agent/linux.asc | sudo apt-key add -
-        apt-get -y update
-        apt-get -y install rackspace-monitoring-agent apache2
-        echo "monitoring_id $(ls /var/lib/cloud/instances/)" >> /etc/rackspace-monitoring-agent.cfg
-        echo "monitoring_token 5aac49d84269b4da472d8a620093b37d9f81bea97bb041ed4d81db471afbdabe.897686" >> /etc/rackspace-monitoring-agent.cfg
-        service rackspace-monitoring-agent restart
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash
+            echo "deb http://stable.packages.cloudmonitoring.rackspace.com/ubuntu-14.04-x86_64 cloudmonitoring main" > /etc/apt/sources.list.d/rackspace-monitoring-agent.list
+            curl https://monitoring.api.rackspacecloud.com/pki/agent/linux.asc | sudo apt-key add -
+            apt-get -y update
+            apt-get -y install rackspace-monitoring-agent apache2
+            echo "monitoring_token {{token}}" > /etc/rackspace-monitoring-agent.cfg
+            service rackspace-monitoring-agent restart
+          params:
+            "{{token}}": { get_resource: token }
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
         stack-name: { get_param: "OS::stack_name" }
@@ -39,6 +42,11 @@ resources:
         stack-name: { get_param: "OS::stack_name" }
       ip_addresses:
         web_server: { get_attr: [ server, accessIPv4 ] }
+
+  token:
+    type: Rackspace::CloudMonitoring::AgentToken
+    properties:
+      label: { get_param: "OS::stack_name" }
 
   webcheck:
     type: Rackspace::CloudMonitoring::Check
