@@ -53,6 +53,16 @@ resources:
               [Service]
               Type=oneshot
               ExecStart=/usr/bin/systemctl enable docker-tcp.socket
+        write_files:
+          - path: /home/core/.dockercfg
+            permissions: '0644'
+            owner: root:root
+            content: |
+              {
+              "http://23.253.106.198": {
+              "auth": "c2FiZWVuOnNhYmVlbjEyMw==",
+              "email": "sabeen.syed@rackspace.com"}
+              }
 ##########################################################################################
 # Enable alternative repositories example: https://coreos.com/docs/launching-
 # containers/building/customizing-docker/#using-a-dockercfg-file-for-authentication
@@ -73,98 +83,35 @@ resources:
 #            }
 ##########################################################################################
 
-  ################################################
-  # Generate random passwords for the wp db user #
-  # and root mysql user                          #
-  ################################################
 
-  random_pass:
-    type: OS::Heat::RandomString
+  ############################################
+  # Docker Container                         #
+  #                                          #
+  ############################################
 
-  root_random_pass:
-    type: OS::Heat::RandomString
-
-  ################################################
-  # Wordpress container wired to MySQL container #
-  # https://registry.hub.docker.com/_/wordpress/ #
-  ################################################
-
-  wpcontainer:
+  solum_container:
     type: DockerInc::Docker::Container
-    # don't know if the depends_on is really needed
-    # but wait on the mysql container to start before
-    # popping the wordpress container just in case
-    depends_on: mysqlcontainer
     properties:
-      name: wordpress-container
-      image: wordpress
-      env:
-      - "WORDPRESS_DB_USER=wpuser"
-      - "WORDPRESS_DB_NAME=wordpress"
-      - str_replace:
-          template: "WORDPRESS_DB_PASSWORD=password"
-          params:
-            password: { get_resource: random_pass }
+      name: solum-container
+      image: nodeus-1
+      user: root
       port_specs:
       - "80:80"
       port_bindings:
         80/tcp:
           HostPort: 80
-      links:
-        mysql-container: mysql
       docker_endpoint:
         str_replace:
           template: "host:2375"
           params:
             host: { get_attr: [ container_host, accessIPv4 ] }
-
-  ############################################
-  # MySQL Container                          #
-  # https://registry.hub.docker.com/_/mysql/ #
-  ############################################
-
-  mysqlcontainer:
-    type: DockerInc::Docker::Container
-    properties:
-      name: mysql-container
-      image: mysql
-      env:
-      - str_replace:
-          template: "MYSQL_ROOT_PASSWORD=password"
-          params:
-            password: { get_resource: root_random_pass }
-      - str_replace:
-          template: "MYSQL_PASSWORD=password"
-          params:
-            password: { get_resource: random_pass }
-      - "MYSQL_DATABASE=wordpress"
-      - "MYSQL_USER=wpuser"
-      docker_endpoint:
-        str_replace:
-          template: "host:2375"
-          params:
-            host: { get_attr: [ container_host, accessIPv4 ] }
+      hostname:
 
 outputs:
+  solum_status:
+    description: Status
+    value: { get_attr: [ solum_container, info, State ] }
 
-  ####################################################
-  # Output the url for the WP blog and the status of #
-  # each container                                   #
-  ####################################################
-
-  wordpress_url:
-    description: URL to access the WordPress site
-    value:
-      str_replace:
-        template: "http://address"
-        params:
-          address: { get_attr: [ container_host, accessIPv4 ] }
-
-  mysql_status:
-    description: Status of the MySQL container
-    value: { get_attr: [ mysqlcontainer, info, State ] }
-
-  wp_status:
-    description: Status of the WordPress container
-    value: { get_attr: [ wpcontainer, info, State ] }
-
+  solum_ip:
+    description: container host ip
+    value: { get_attr: [ container_host, accessIPv4 ] }

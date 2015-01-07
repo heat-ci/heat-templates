@@ -1,0 +1,74 @@
+---
+heat_template_version: 2014-10-16
+
+parameters:
+  flavor:
+    constraints:
+      -
+        allowed_values:
+          - "2 GB Performance"
+          - "4 GB Performance"
+          - "8 GB Performance"
+          - "15 GB Performance"
+          - "30 GB Performance"
+          - "2GB Standard Instance"
+          - "4GB Standard Instance"
+          - "8GB Standard Instance"
+          - "15GB Standard Instance"
+          - "30GB Standard Instance"
+        description: |
+            Must be a valid Rackspace Cloud Server flavor for the region you have
+            selected to deploy into.
+    default: "4 GB Performance"
+    type: string
+
+  name:
+    default: CoreOS-stable
+    description: "Name of each CoreOS machine booted"
+    type: string
+
+  docker_run:
+    type: string
+    default: "docker run -p 80:5000 -d 23.253.106.198:5042/nodeus-1"
+
+resources:
+
+  compute_instance:
+    type: "OS::Nova::Server"
+    properties:
+      config_drive: "true"
+      flavor:
+        get_param: flavor
+      image: 7fd88211-ce43-41bf-9a85-e73df4066581
+      name:
+        str_replace:
+          template: stack-compute-instance
+          params:
+            stack: { get_param: "OS::stack_name" }
+      user_data: |
+        #!/bin/bash
+        docker run -p 80:5000 -d 23.253.106.198:5042/nodeus-1
+      user_data_format: RAW
+
+  lb:
+    type: Rackspace::Cloud::LoadBalancer
+    properties:
+      name:
+        str_replace:
+          template: Stack Compute Load Balancer
+          params:
+            "Stack": { get_param: "OS::stack_name" }
+      nodes:
+      - addresses: [ { get_attr: [compute_instance, networks, private, 0] } ]
+        port: 80
+        condition: ENABLED
+      protocol: HTTP
+      port: 80
+      virtualIps:
+      - type: PUBLIC
+        ipVersion: IPV4
+
+ outputs:
+  "Load Balancer IP":
+    value: { get_attr: [ lb, PublicIp ] }
+    description: Load Balancer IP
