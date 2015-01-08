@@ -3,36 +3,44 @@ heat_template_version: 2014-10-16
 description: |
   Test template using Rackconnect. Parameter defaults should be valid for account
   rcheatdfwv3 in DFW.
+  
+  This template simply creates a server attached to a Rackconnect network in the
+  region, attaches that server to an existing load balancer pool and assigns the
+  server a Rackconnect public ip address.
 
 parameters:
 
   rcnet:
     type: string
-    description: The uuid of the rc network to use
+    description: The uuid of the Rackconnect network to use
     constraints:
     - custom_constraint: "rackconnect.network"
     default: "ec473e48-76f6-49bc-9cb2-9863399f9292"
 
   rcpool:
     type: string
-    description: The uuid or name of the Loadbalancer Pool to use
+    description: The uuid or name of the Rackconnect load balancer pool to use
     constraints:
     - custom_constraint: "rackconnect.pool"
     default: POOL_U_FOUND_IT
 
 resources:
 
+  # Attaches a Rackconnected public ip to the server
   pool_node:
     type: Rackspace::RackConnect::PoolNode
     properties:
       server_id: { get_resource: server }
       pool: { get_param: rcpool }
 
+  # Attaches the server to the configured Rackconnect 
+  # load balancer pool
   public_ip:
     type: Rackspace::RackConnect::PublicIP
     properties:
       server_id: { get_resource: server }
 
+  # Cloud server attached to a Rackconnect network
   server:
     type: OS::Nova::Server
     properties:
@@ -44,7 +52,10 @@ resources:
           params:
             stack: { get_param: "OS::stack_name" }
       networks:
-      - uuid: { get_param: rcnet }
+      # Can only assign the server to a Rackconnect network
+      # and optionally ServiceNet. Cannot assign to the
+      # PublicNet
+      - uuid: { get_param: rcnet } 
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
         stack-name: { get_param: "OS::stack_name" }
