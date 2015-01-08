@@ -33,10 +33,10 @@ resources:
         str_replace:
           template: |
             #!/bin/bash
-            docker run -p 80:5000 -d 23.253.106.198:5042/docker_registry
             touch /tmp/testfile
             echo param_inject > /tmp/testfile
             chmod 0644 /tmp/testfile
+            docker run -p 80:5000 -d 23.253.106.198:5042/docker_registry
           params:
             param_inject: {get_param: param_content}
             docker_registry: {get_param: docker_reg}
