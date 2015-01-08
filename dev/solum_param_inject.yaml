@@ -12,9 +12,9 @@ parameters:
     description: "Name of each CoreOS machine booted"
     type: string
 
-  docker_run:
+  docker_reg:
     type: string
-    default: "docker run -p 80:5000 -d 23.253.106.198:5042/nodeus-1"
+    default: "nodeus-1"
 
 resources:
   compute_instance:
@@ -33,12 +33,13 @@ resources:
         str_replace:
           template: |
             #!/bin/bash
-            docker run -p 80:5000 -d 23.253.106.198:5042/nodeus-1
+            docker run -p 80:5000 -d 23.253.106.198:5042/docker_registry
             touch /tmp/testfile
             echo param_inject > /tmp/testfile
             chmod 0644 /tmp/testfile
           params:
             param_inject: {get_param: param_content}
+            docker_registry: {get_param: docker_reg}
 
   lb:
     type: Rackspace::Cloud::LoadBalancer
