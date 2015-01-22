@@ -3,7 +3,7 @@ heat_template_version: 2014-10-16
 description: |
   Test template using Rackconnect. Parameter defaults should be valid for account
   rcheatdfwv3 in DFW.
-  
+
   This template simply creates a server attached to a Rackconnect network in the
   region, attaches that server to an existing load balancer pool and assigns the
   server a Rackconnect public ip address.
@@ -26,15 +26,16 @@ parameters:
 
 resources:
 
-  # Attaches a Rackconnected public ip to the server
+ # Attaches the server to the configured Rackconnect
+ # load balancer pool
   pool_node:
     type: Rackspace::RackConnect::PoolNode
     properties:
       server_id: { get_resource: server }
       pool: { get_param: rcpool }
 
-  # Attaches the server to the configured Rackconnect 
-  # load balancer pool
+
+  # Attaches a Rackconnected public ip to the server
   public_ip:
     type: Rackspace::RackConnect::PublicIP
     properties:
@@ -46,7 +47,7 @@ resources:
     properties:
       image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
       flavor: 2 GB Performance
-      name: 
+      name:
         str_replace:
           template: stack-server
           params:
@@ -55,7 +56,7 @@ resources:
       # Can only assign the server to a Rackconnect network
       # and optionally ServiceNet. Cannot assign to the
       # PublicNet
-      - uuid: { get_param: rcnet } 
+      - uuid: { get_param: rcnet }
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
         stack-name: { get_param: "OS::stack_name" }
