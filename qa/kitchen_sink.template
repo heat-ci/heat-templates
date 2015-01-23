@@ -358,7 +358,7 @@ resources:
         type: Rackspace::Cloud::Server
         properties:
           name: "kitchen_sink_engine_%index%"
-          image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+          image: 753a7703-4960-488b-aab4-a3cdd4b276dc # Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
           networks:
@@ -400,7 +400,7 @@ resources:
   aws_server:
     type: AWS::EC2::Instance
     properties:
-      ImageId: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      ImageId: 753a7703-4960-488b-aab4-a3cdd4b276dc # Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
       InstanceType: { get_param: devops_flavor }
       KeyName: { get_resource: access_key }
       UserData:
@@ -451,7 +451,7 @@ resources:
     type: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/provider_resource.template
     properties:
       flavor: { get_param: devops_flavor }
-      image: 2936a16d-ee01-452c-a6ab-7117df5196f8  # Ubuntu 13.10 (Saucy Salamander)
+      image: 753a7703-4960-488b-aab4-a3cdd4b276dc # Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
       key_name: { get_resource: access_key }
 
 outputs:
