@@ -1,0 +1,62 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Test template using Neutron
+
+resources:
+
+  network:
+    type: OS::Neutron::Net
+    properties:
+      name:
+        str_replace:
+          template: stack-net
+          params:
+            stack: { get_param: "OS::stack_name" }
+
+  subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: network }
+      cidr: 192.168.0.0/24
+      name:
+        str_replace:
+          template: stack-subnet
+          params:
+            stack: { get_param: "OS::stack_name" }
+
+  port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: network }
+      fixed_ips:
+      - subnet: { get_resource: subnet }
+        ip_address: 192.168.0.100
+      name:
+        str_replace:
+          template: stack-port
+          params:
+            stack: { get_param: "OS::stack_name" }
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+      flavor: 2 GB Performance
+      name: 
+        str_replace:
+          template: stack-server
+          params:
+            stack: { get_param: "OS::stack_name" }
+      networks:
+      - port: { get_resource: port }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+        stack-name: { get_param: "OS::stack_name" }
+
+      
+
+
+      
+      
+    

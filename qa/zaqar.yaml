@@ -1,0 +1,25 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Test template using Zaqar (Cloud Queues)
+
+resources:
+
+  queue:
+    type: OS::Zaqar::Queue
+    properties:
+      name:
+        str_replace:
+          template: stack-queue
+          params:
+            stack: { get_param: "OS::stack_name" }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+        stack-name: { get_param: "OS::stack_name" }
+
+      
+
+
+      
+      
+    
