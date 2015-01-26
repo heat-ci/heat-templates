@@ -1,9 +1,0 @@
-heat_template_version: '2013-05-23'
-
-resources:
-  compute_instance:
-    type: OS::Nova::Server
-    properties:
-      flavor: 4 GB Performance
-      image: 2936a16d-ee01-452c-a6ab-7117df5196f8 # Ubuntu 13.10 (Saucy Salamander)
-      personality: {/tmp/testfile: testfile}
