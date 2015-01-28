@@ -1,0 +1,161 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Test template using all OpenStack resources supported on the Public Cloud
+  Currently in progress
+
+parameters:
+
+  flavor:
+    type: string
+    description: Flavor name for the devops server
+    default: m1.small
+    constraints:
+    - allowed_values:
+      - m1.small
+      - 2GB Standard Instance
+
+  image_id:
+    type: string
+
+  subnet_cidr:
+    type: string
+
+resources:
+
+  random_key_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: 8
+
+  access_key:
+    type: OS::Nova::KeyPair
+    properties:
+      name: { get_resource: random_key_name }
+      save_private_key: true
+
+  network:
+    type: OS::Neutron::Net
+    properties:
+      name: priv_network
+      name: NewNetwork
+
+  subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { Ref: network }
+      name: priv_subnet
+      ip_version: 4
+      cidr: { get_param: subnet_cidr }
+      dns_nameservers: ["8.8.8.8"]
+
+  server0:
+    type: OS::Nova::Server
+    properties:
+      name: kitchen_sink_ops01
+      image: { get_param: image_id }
+      flavor: { get_param: flavor }
+      key_name: { get_resource: access_key }
+      networks:
+      - network: { get_resource: network }
+
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name: kitchen_sink_ops02
+      image: { get_param: image_id }
+      flavor: { get_param: flavor }
+      key_name: { get_resource: access_key }
+      networks:
+      - network: { get_resource: network }
+
+  server1_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { Ref: network }
+      security_groups: [ { get_resource: server_security_group } ]
+
+  router:
+    type: OS::Neutron::Router
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { Ref: router }
+      subnet_id: { Ref: subnet }
+
+  monitor:
+    type: OS::Neutron::HealthMonitor
+    properties:
+      type: TCP
+      delay: 10
+      max_retries: 5
+      timeout: 5
+
+  pool:
+    type: OS::Neutron::Pool
+    properties:
+      protocol: HTTP
+      monitors: [ { get_resource: monitor } ]
+      subnet_id: { get_resource: subnet }
+      lb_method: ROUND_ROBIN
+      vip:
+        protocol_port: 80
+
+  lb:
+    type: OS::Neutron::LoadBalancer
+    properties:
+      protocol_port: 80
+      pool_id: { get_resource: pool }
+
+  server_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Add security group rules for server
+      name: security-group
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+
+  volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 1
+      description: Created from the kitchen sink template
+
+  attach_vol:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: server0 }
+      volume_id: { get_resource: volume }
+
+  object_store:
+    type: OS::Swift::Container
+    properties:
+      name: { get_resource: random_key_name }
+
+outputs:
+
+  network_id:
+    value: { get_resource: network }
+    description: Private Network ID
+
+  access_private_key:
+    value: { get_attr: [ access_key, private_key ] }
+    description: SSH access private key
+
+  volume_id:
+    value: { get_resource: volume }
+    description: Volume ID
+
+  object_store_id:
+    value: { get_resource: object_store }
+    description: Object Store ID
+
+  website_URL:
+    description: "URL for website hosted on S3"
+    value: { get_attr: [object_store, WebsiteURL] }

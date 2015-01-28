@@ -57,10 +57,10 @@ resources:
 # Enable alternative repositories example: https://coreos.com/docs/launching-
 # containers/building/customizing-docker/#using-a-dockercfg-file-for-authentication
 #        write_files:
-#        - path: /home/core/.dockercfg
-#          owner: core:core
-#          permissions: 0644
-#          content: |
+#          - path: /home/core/.dockercfg
+#            owner: core:core
+#            permissions: 0644
+#            content: |
 #            {
 #              "https://index.docker.io/v1/": {
 #              "auth": "xXxXxXxXxXx=",
@@ -70,7 +70,7 @@ resources:
 #              "auth": "XxXxXxXxXxX=",
 #              "email": "username@example.com"
 #            }
-#          }
+#            }
 ##########################################################################################
 
   ################################################
