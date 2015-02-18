@@ -5,7 +5,7 @@ resources:
         properties:
             context:
                 region_name: DFW
-            template: https://github.com/BeenzSyed/heat-templates/blob/updatetemp/dev/region_stack.template
+            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
             timeout: 60
             parameters:
                 region: DFW
@@ -15,7 +15,7 @@ resources:
         properties:
             context:
                 region_name: ORD
-            template: https://github.com/BeenzSyed/heat-templates/blob/updatetemp/dev/region_stack.template
+            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
             timeout: 60
             parameters:
                 region: ORD
@@ -25,7 +25,7 @@ resources:
         properties:
             context:
                 region_name: IAD
-            template: https://github.com/BeenzSyed/heat-templates/blob/updatetemp/dev/region_stack.template
+            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
             timeout: 60
             parameters:
                 region: IAD
@@ -35,7 +35,7 @@ resources:
         properties:
             context:
                 region_name: HKG
-            template: https://github.com/BeenzSyed/heat-templates/blob/updatetemp/dev/region_stack.template
+            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
             timeout: 60
             parameters:
                 region: HKG
@@ -45,7 +45,7 @@ resources:
         properties:
             context:
                 region_name: SYD
-            template: https://github.com/BeenzSyed/heat-templates/blob/updatetemp/dev/region_stack.template
+            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
             timeout: 60
             parameters:
                 region: SYD
