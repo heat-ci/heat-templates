@@ -7,7 +7,7 @@ resources:
     properties:
       context:
         region_name: DFW
-      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      template: { get_file: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template }
       timeout: 60
       parameters:
         region: DFW
@@ -17,7 +17,7 @@ resources:
     properties:
       context:
         region_name: ORD
-      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      template: { get_file: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template }
       timeout: 60
       parameters:
         region: ORD
@@ -27,7 +27,7 @@ resources:
     properties:
       context:
         region_name: IAD
-      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      template: { get_file: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template }
       timeout: 60
       parameters:
         region: IAD
@@ -37,7 +37,7 @@ resources:
     properties:
       context:
         region_name: HKG
-      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      template: { get_file: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template }
       timeout: 60
       parameters:
         region: HKG
@@ -47,7 +47,7 @@ resources:
     properties:
       context:
         region_name: SYD
-      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      template: { get_file: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template }
       timeout: 60
       parameters:
         region: SYD
