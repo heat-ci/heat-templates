@@ -1,51 +1,53 @@
 heat_template_version: 2013-05-23
+
 resources:
-    DFW_stack:
-        type: OS::Heat::Stack
-        properties:
-            context:
-                region_name: DFW
-            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
-            timeout: 60
-            parameters:
-                region: DFW
 
-    ORD_stack:
-        type: OS::Heat::Stack
-        properties:
-            context:
-                region_name: ORD
-            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
-            timeout: 60
-            parameters:
-                region: ORD
+  DFW_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: DFW
+      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: DFW
 
-    IAD_stack:
-        type: OS::Heat::Stack
-        properties:
-            context:
-                region_name: IAD
-            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
-            timeout: 60
-            parameters:
-                region: IAD
+  ORD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: ORD
+      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: ORD
 
-    HKG_stack:
-        type: OS::Heat::Stack
-        properties:
-            context:
-                region_name: HKG
-            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
-            timeout: 60
-            parameters:
-                region: HKG
+  IAD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: IAD
+      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: IAD
 
-    SYD_stack:
-        type: OS::Heat::Stack
-        properties:
-            context:
-                region_name: SYD
-            template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
-            timeout: 60
-            parameters:
-                region: SYD
+  HKG_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: HKG
+      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: HKG
+
+  SYD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: SYD
+      template: https://raw.githubusercontent.com/BeenzSyed/heat-templates/updatetemp/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: SYD
