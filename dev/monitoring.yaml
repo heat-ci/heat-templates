@@ -90,18 +90,31 @@ resources:
       label: email_heat_team
       type: email
       details:
-        address: "rs-heat@lists.rackspace.com"
+        address: "admin@example.com"
+  
+  email_notification_2:
+    type: Rackspace::CloudMonitoring::Notification
+    properties:
+      label: email_heat_team_2
+      type: email
+      details:
+        address: "allclear@example.com"
 
   notify_heat_team:
     type: Rackspace::CloudMonitoring::NotificationPlan
     properties:
-      label: heat_notification_plan
-      ok_state:
-      - { get_resource: email_notification }
+      label: { get_param: "OS::stack_name" }
       warning_state:
       - { get_resource: email_notification }
       critical_state:
       - { get_resource: email_notification }
+
+  add_ok_notification:
+    type: Rackspace::CloudMonitoring::PlanNotifications
+    properties:
+      plan: { get_resource: notify_heat_team }
+      ok_state:
+      - { get_resource: email_notification_2 }
 
   alert_randall:
     type: Rackspace::CloudMonitoring::Alarm
