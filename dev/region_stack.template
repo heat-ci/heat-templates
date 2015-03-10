@@ -1,0 +1,17 @@
+heat_template_version: 2013-05-23
+
+parameters:
+  region:
+    type: string
+resources:
+  resource1:
+    type: OS::Nova::Server
+    properties:
+      image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+      flavor: 2 GB Performance
+      name:
+        str_replace:
+          template: stack-server-region
+          params:
+            stack: { get_param: "OS::stack_name" }
+            region: { get_param: region }

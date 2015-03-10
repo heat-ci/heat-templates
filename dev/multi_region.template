@@ -1,0 +1,58 @@
+heat_template_version: 2013-05-23
+
+resources:
+
+  DFW_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: DFW
+      template:
+        get_file: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: DFW
+
+  ORD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: ORD
+      template:
+        get_file: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: ORD
+
+  IAD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: IAD
+      template:
+        get_file: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: IAD
+
+  HKG_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: HKG
+      template:
+        get_file: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: HKG
+
+  SYD_stack:
+    type: OS::Heat::Stack
+    properties:
+      context:
+        region_name: SYD
+      template:
+        get_file: https://raw.githubusercontent.com/heat-ci/heat-templates/master/dev/region_stack.template
+      timeout: 60
+      parameters:
+        region: SYD
