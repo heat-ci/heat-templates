@@ -19,7 +19,6 @@ resources:
                 stackname: { get_param: "OS::stack_name" }
       image: CoreOS (Stable)
       flavor: 4 GB Performance
-      admin_pass: password
       config_drive: true
       user_data_format: RAW
       # Expose the docker rest API on the CoreOS machine (not secure)
