@@ -10,7 +10,6 @@ resources:
     properties:
       image: Fedora 20 (Heisenbug) (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-f20
@@ -28,7 +27,6 @@ resources:
     properties:
       image: Fedora 21 (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-f21
@@ -46,7 +44,6 @@ resources:
     properties:
       image: Red Hat Enterprise Linux 6 (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-rhel-6
@@ -64,7 +61,6 @@ resources:
     properties:
       image: Red Hat Enterprise Linux 7 (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-rhel-7
@@ -82,7 +78,6 @@ resources:
     properties:
       image: CentOS 6 (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-centos-6
@@ -100,7 +95,6 @@ resources:
     properties:
       image: CentOS 7 (PVHVM)
       flavor: 1 GB Performance
-      admin_pass: password
       name: 
         str_replace:
           template: stack-centos-7
