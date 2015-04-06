@@ -516,7 +516,7 @@ resources:
     properties:
       count: { get_param: wp_web_server_count }
       resource_def:
-        type: "file:///Users/randall.burt/Documents/Projects/rackspace/wordpress-multi/wordpress-web-server.yaml"
+        type: { get_param: child_template }
         properties:
           agent_config: { get_attr: [ cloud_monitoring_config, config ] }
           wp_web_server_hostname: { get_param: wp_web_server_hostnames }
