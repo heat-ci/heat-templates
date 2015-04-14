@@ -267,6 +267,25 @@ resources:
       nodes: []
       virtualIps:
       - id: { get_attr: [ api_loadbalancer, virtualIps, 0, id ] }
+
+  http_redir_lb:
+    type: Rackspace::Cloud::LoadBalancer
+    properties:
+      name:
+        str_replace:
+          template: "stack-redir-lb"
+          params:
+            stack: { get_param: "OS::stack_name" }
+      metadata:
+        rax-heat: { get_param: "OS::stack_id" }
+      protocol: HTTPS
+      port: 443
+      httpsRedirect: true
+      algorithm: ROUND_ROBIN
+      nodes: []
+      virtualIps:
+      - type: PUBLIC
+        ipVersion: IPV4
   
   wait_on_server:
     type: OS::Heat::SwiftSignal
