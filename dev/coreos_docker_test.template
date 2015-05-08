@@ -17,7 +17,7 @@ resources:
             template: stackname-container-host
             params:
                 stackname: { get_param: "OS::stack_name" }
-      image: CoreOS (Stable)
+      image: CoreOS (Beta)
       flavor: 4 GB Performance
       config_drive: true
       user_data_format: RAW
