@@ -21,23 +21,6 @@ resources:
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
         stack-name: { get_param: "OS::stack_name" }
-
-  fedora-22:
-    type: Rackspace::Cloud::Server
-    properties:
-      image: Fedora 22 (PVHVM)
-      flavor: 1 GB Performance
-      name:
-        str_replace:
-          template: stack-f22
-          params:
-            stack: { get_param: "OS::stack_name" }
-      user_data:
-        #!/bin/bash
-        echo "Hello World" > test.txt
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
-        stack-name: { get_param: "OS::stack_name" }
   
   rhel-6:
     type: Rackspace::Cloud::Server
@@ -111,9 +94,6 @@ outputs:
 
   fedora-21:
     value: { get_attr: [ fedora-21, accessIPv4 ] }
-
-  fedora-22:
-    value: { get_attr: [ fedora-22, accessIPv4 ] }
 
   rhel-6:
     value: { get_attr: [ rhel-6, accessIPv4 ] }
