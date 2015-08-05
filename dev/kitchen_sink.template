@@ -377,7 +377,7 @@ resources:
         type: Rackspace::Cloud::Server
         properties:
           name: "kitchen_sink_engine_%index%"
-          image: 753a7703-4960-488b-aab4-a3cdd4b276dc # Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+          image: 6f29d6a6-9972-4ae0-aa80-040fa2d6a9cf # Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
           flavor: { get_param: devops_flavor }
           key_name: { get_resource: access_key }
           networks:

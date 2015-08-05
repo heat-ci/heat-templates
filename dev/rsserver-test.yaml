@@ -5,14 +5,14 @@ description: |
 
 resources:
 
-  fedora-20:
+  fedora-21:
     type: Rackspace::Cloud::Server
     properties:
-      image: Fedora 20 (Heisenbug) (PVHVM)
+      image: Fedora 21 (PVHVM)
       flavor: 1 GB Performance
       name: 
         str_replace:
-          template: stack-f20
+          template: stack-f21
           params:
             stack: { get_param: "OS::stack_name" }
       user_data:
@@ -22,14 +22,14 @@ resources:
         rax-heat: { get_param: "OS::stack_id" }
         stack-name: { get_param: "OS::stack_name" }
 
-  fedora-21:
+  fedora-22:
     type: Rackspace::Cloud::Server
     properties:
-      image: Fedora 21 (PVHVM)
+      image: Fedora 22 (PVHVM)
       flavor: 1 GB Performance
-      name: 
+      name:
         str_replace:
-          template: stack-f21
+          template: stack-f22
           params:
             stack: { get_param: "OS::stack_name" }
       user_data:
@@ -108,9 +108,6 @@ resources:
         stack-name: { get_param: "OS::stack_name" }
 
 outputs:
-
-  fedora-20:
-    value: { get_attr: [ fedora-20, accessIPv4 ] }
 
   fedora-21:
     value: { get_attr: [ fedora-21, accessIPv4 ] }
