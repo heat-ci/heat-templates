@@ -1,34 +1,13 @@
 heat_template_version: 2015-04-30
-description: Test template to create port wit ip_address.
+description: Test template to assign security groups to a server port using independent resource.
 parameters:
-  mac:
-    type: string
-    default: 00-00-00-00-BB-BB
 resources:
   server1:
     type: OS::Nova::Server
     properties:
       name: Server1
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - port: { get_resource: server1_port }
-  net:
-    type: OS::Neutron::Net
-  subnet:
-    type: OS::Neutron::Subnet
-    properties:
-      network: { get_resource: net }
-      cidr: 11.11.11.0/24
-  server1_port:
-    type: OS::Neutron::Port
-    properties:
-      network: { get_resource: net }
-      mac_address: { get_param: mac }
-      fixed_ips:
-        - subnet: { get_resource: subnet }
-          ip_address: 11.11.11.11
+      image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM) 
+      flavor: 2 GB Performance
   security_grp:
     type: OS::Neutron::SecurityGroup
     properties:
@@ -42,10 +21,10 @@ resources:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: icmp
   security_grp_attachment:
-    type: OS::Neutron::AttachSecurityGroupToPort
+    type: OS::Neutron::SecurityGroupAttachment
     properties:
-      port: { get_resource: server1_port }
+      port: { get_attr: [ server1, addresses, public, 0, port ] }
       security_group: { get_resource: security_grp }
 outputs:
   port_ip:
-    value: {get_attr: [port, fixed_ips, 0, ip_address]}
+    value: {get_attr: [server1, show]}
