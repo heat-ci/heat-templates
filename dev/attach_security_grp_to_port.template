@@ -1,0 +1,30 @@
+heat_template_version: 2015-04-30
+description: Test template to assign security groups to a server port using independent resource.
+parameters:
+resources:
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name: Server1
+      image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM) 
+      flavor: 2 GB Performance
+  security_grp:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: a security group to be added to server
+      name: security1
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+  security_grp_attachment:
+    type: OS::Neutron::SecurityGroupAttachment
+    properties:
+      port: { get_attr: [ server1, addresses, public, 0, port ] }
+      security_group: { get_resource: security_grp }
+outputs:
+  port_ip:
+    value: {get_attr: [server1, show]}
