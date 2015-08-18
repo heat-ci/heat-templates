@@ -1,3 +1,5 @@
+**NOTE: This repository has been moved to https://github.com/rackerlabs/heat-ci. All pull request MUST be made to that repository. This repository will soon be REMOVED**
+
 Heat CI/CD Templates
 ====================
 
