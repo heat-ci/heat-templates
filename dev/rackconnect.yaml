@@ -69,7 +69,8 @@ resources:
       networks:
       # Can only assign the server to a Rackconnect network
       # and optionally ServiceNet. Cannot assign to the
-      # PublicNet
+      # PublicNet (Note: Managed operations customers must
+      # provide ServiceNet along with RackConnect network)
       - uuid: { get_param: rcnet }
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
@@ -95,7 +96,8 @@ resources:
       networks:
       # Can only assign the server to a Rackconnect network
       # and optionally ServiceNet. Cannot assign to the
-      # PublicNet
+      # PublicNet (Note: Managed operations customers must
+      # provide ServiceNet along with RackConnect network)
       - uuid: { get_param: rcnet }
       - uuid: "11111111-1111-1111-1111-111111111111"
       metadata:
