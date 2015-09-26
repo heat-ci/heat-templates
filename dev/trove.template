@@ -1,0 +1,30 @@
+heat_template_version: 2013-05-23
+
+description: |
+  Test template for Trove
+
+parameters:
+  db_pass:
+    type: string
+    hidden: true
+    description: Database access password
+    default: secrete
+
+resources:
+  service_db:
+    type: OS::Trove::Instance
+    properties:
+      name: kitchen_sink_db
+      flavor: 1GB Instance
+      size: 10
+      databases:
+      - name: kitchen_sink_data
+      users:
+      - name: kitchen_sink
+        password: { get_param: db_pass }
+        databases: [ kitchen_sink_data ]
+
+outputs:
+  "DB ID":
+    value: { get_resource: service_db }
+    description: Database instance ID
